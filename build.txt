@@ -1,0 +1,3 @@
+displayName = ATLA Mod
+author = Michael Clark
+version = 0.1
