@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<!-- Import tModLoader mod properties -->
 	<Import Project="..\tModLoader.targets" />
@@ -7,10 +7,20 @@
 	<PropertyGroup>
 		
 	</PropertyGroup>
+	<ItemGroup>
+	  <None Remove="Assets\UITextures\buttoniconTest.png" />
+	  <None Remove="Assets\UITextures\buttonTest.png" />
+	  <None Remove="Assets\UITextures\uiTest.png" />
+	  <None Remove="Buffs\BendingStyles\airbenderBuff.png" />
+	  <None Remove="Buffs\BendingStyles\earthbenderBuff.png" />
+	  <None Remove="Buffs\BendingStyles\firebenderBuff.png" />
+	  <None Remove="Buffs\BendingStyles\waterbenderBuff.png" />
+	  <None Remove="Items\BendingScroll.png" />
+	</ItemGroup>
 
 	<!-- References -->
 	<ItemGroup>
-		
+	  <Folder Include="Systems\DamageClass\" />
 	</ItemGroup>
 
 </Project>

@@ -1,2 +1,33 @@
-# This file will automatically update with entries for new content after a build and reload.
+Mods: {
+	ATLAMod: {
+	}
+}
 
+Buffs: {
+	airbenderBuff: {
+		DisplayName: Airbender
+		Description: You are an Airbender
+	}
+
+	earthbenderBuff: {
+		DisplayName: Earthbender
+		Description: You are an Airbender
+	}
+
+	firebenderBuff: {
+		DisplayName: Firebender
+		Description: You are a Firebender
+	}
+
+	waterbenderBuff: {
+		DisplayName: Waterbender
+		Description: You are a Waterbender
+	}
+}
+
+Items: {
+	BendingScroll: {
+		DisplayName: Bending Scroll
+		Tooltip: ""
+	}
+}
