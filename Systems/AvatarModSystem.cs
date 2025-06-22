@@ -46,14 +46,48 @@ namespace ATLAMod.Systems
             }
         }
 
+        public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
+        {
+            int mouseTextIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
+
+            if (mouseTextIndex != -1)
+            {
+                if (bendingChooseUI.Visible)
+                {
+                    layers.Insert(mouseTextIndex, new LegacyGameInterfaceLayer(
+                        "AvatarMod: Bending Choose UI",
+                        () =>
+                        {
+                            bendingChooseInterface?.Draw(Main.spriteBatch, new GameTime());
+                            return true;
+                        },
+                        InterfaceScaleType.UI));
+                }
+
+                if (bendingMovesUI.Visible)
+                {
+                    layers.Insert(mouseTextIndex, new LegacyGameInterfaceLayer(
+                        "AvatarMod: Bending Moves UI",
+                        () =>
+                        {
+                            bendingMovesInterface?.Draw(Main.spriteBatch, new GameTime());
+                            return true;
+                        },
+                        InterfaceScaleType.UI));
+                }
+            }
+        }
+
         public void ShowChooseUI()
         {
             bendingChooseUI.Show();
+            bendingChooseInterface?.SetState(bendingChooseUI);           
         }
 
         public void ShowBendingMovesUI()
         {
             bendingMovesUI.Show();
+            bendingMovesInterface?.SetState(bendingMovesUI);
         }
 
 

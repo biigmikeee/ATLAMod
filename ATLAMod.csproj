@@ -8,9 +8,9 @@
 		
 	</PropertyGroup>
 	<ItemGroup>
-	  <None Remove="Assets\UITextures\buttoniconTest.png" />
-	  <None Remove="Assets\UITextures\buttonTest.png" />
-	  <None Remove="Assets\UITextures\uiTest.png" />
+	  <None Remove="Assets\UITextures\choosebackgroundTEST.png" />
+	  <None Remove="Assets\UITextures\choosebuttoniconhoverTEST.png" />
+	  <None Remove="Assets\UITextures\choosebuttoniconTEST.png" />
 	  <None Remove="Buffs\BendingStyles\airbenderBuff.png" />
 	  <None Remove="Buffs\BendingStyles\earthbenderBuff.png" />
 	  <None Remove="Buffs\BendingStyles\firebenderBuff.png" />

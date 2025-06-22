@@ -9,6 +9,7 @@ using Terraria.ModLoader.IO;
 using ATLAMod;
 using ATLAMod.Buffs.BendingStyles;
 using ATLAMod.UI.BendingScroll;
+using System.Security.Cryptography.X509Certificates;
 
 namespace ATLAMod.Systems.Players
 {
@@ -28,11 +29,7 @@ namespace ATLAMod.Systems.Players
 
         public override void Initialize()
         {
-            hasLearnedAir = true;
-            hasLearnedFire = true;
-            hasLearnedWater = true;
-            hasLearnedEarth = true;
-            hasChosenBending = true;
+            hasChosenBending = false;
         }
 
         public override void SaveData(TagCompound tag)
