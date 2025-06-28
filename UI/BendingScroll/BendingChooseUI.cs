@@ -13,21 +13,25 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.Audio;
 using Terraria.ID;
 using Steamworks;
+using ATLAMod.Systems;
 
 namespace ATLAMod.UI.BendingScroll
 {
     public class BendingChooseUI : UIState
     {
+        private int inputBlockFrames = 0;
+        private Texture2D whitePixel = null;
+
         public bool Visible;
         private UIImage scrollPanel;
 
-        private UIImageButton fireButton;
-        private UIImageButton waterButton;
-        private UIImageButton earthButton;
-        private UIImageButton airButton;
-
+        private UIElement fireButton;
+        private UIElement waterButton;
+        private UIElement earthButton;
+        private UIElement airButton;
         public override void OnInitialize()
         {
+
             scrollPanel = new UIImage(ModContent.Request<Texture2D>("ATLAMod/Assets/UITextures/choosebackgroundTEST"));
             scrollPanel.Left.Set((Main.screenWidth - 450) / 2f, 0f);
             scrollPanel.Top.Set((Main.screenHeight - 700) / 2f, 0f);
@@ -35,37 +39,65 @@ namespace ATLAMod.UI.BendingScroll
             scrollPanel.Height.Set(700, 0f);
             Append(scrollPanel);
 
-            fireButton = CreateBendingButton("Fire", 100f, ChooseFire);
+            fireButton = CreateBendingButton("Fire", 70f, ChooseFire);
             scrollPanel.Append(fireButton);
 
-            waterButton = CreateBendingButton("Water", 240f, ChooseWater);
+            waterButton = CreateBendingButton("Water", 210f, ChooseWater);
             scrollPanel.Append(waterButton);
 
-            earthButton = CreateBendingButton("Earth", 380f, ChooseEarth);
+            earthButton = CreateBendingButton("Earth", 350f, ChooseEarth);
             scrollPanel.Append(earthButton);
 
-            airButton = CreateBendingButton("Air", 520f, ChooseAir);
+            airButton = CreateBendingButton("Air", 490f, ChooseAir);
             scrollPanel.Append(airButton);
         }
 
-        private UIImageButton CreateBendingButton(string styleName, float top, UIElement.MouseEvent clickAction)
+        public override void OnActivate()
         {
-            UIImageButton button = new UIImageButton(ModContent.Request<Texture2D>("ATLAMod/Assets/UITextures/choosebuttoniconTEST"));
-            button.Left.Set((450 - 180) / 2f, 0f);
-            button.Top.Set(top, 0f);
+            if (whitePixel == null)
+            {
+                Main.NewText("hello");
+                whitePixel = ModContent.Request<Texture2D>($"ATLAMod/Assets/UITextures/whitePixel").Value;
+            }
+        }
+
+        private UIElement CreateBendingButton(string styleName, float top, UIElement.MouseEvent clickAction)
+        {
+            var container = new UIElement();
+            container.Width.Set(180, 0f);
+            container.Height.Set(120, 0f);
+            container.Left.Set((450 - 140) / 2f, 0f);
+            container.Top.Set(top, 0f);
+
+            var buttonTexture = ModContent.Request<Texture2D>($"ATLAMod/Assets/UITextures/choosebuttoniconTEST");
+            var button = new UIImageButton(buttonTexture);
             button.Width.Set(180, 0f);
             button.Height.Set(120, 0f);
-
             button.OnLeftClick += clickAction;
 
-            //hover effect
-            button.OnMouseOver += (evt, element) =>
+            var glowTexture = ModContent.Request<Texture2D>($"ATLAMod/Assets/UITextures/choosebuttoniconhoverTEST");
+            var glowImage = new UIImageButton(glowTexture);
+            glowImage.Width.Set(10, 0f);
+            glowImage.Height.Set(120, 0f);
+            glowImage.Left.Set(0f, 0f);
+            glowImage.Top.Set(0f, 0f);
+            glowImage.SetVisibility(0f, 0f);
+
+            button.OnMouseOver += (_, _) =>
             {
+                glowImage.SetVisibility(1f, 1f);
                 SoundEngine.PlaySound(SoundID.Item4);
-                //tooltip or glow effect
             };
 
-            return button;
+            button.OnMouseOut += (_, _) =>
+            {
+                glowImage.SetVisibility(0f, 0f);
+            };
+
+            container.Append(button);
+            container.Append(glowImage);
+
+            return container;
         }
 
         private void ChooseFire(UIMouseEvent evt, UIElement listeningElement)
@@ -90,6 +122,12 @@ namespace ATLAMod.UI.BendingScroll
 
         private void SetChosenStyle(BendingPlayer.BendingStyle style)
         {
+
+            if (inputBlockFrames > 0)
+            {
+                return;
+            }
+
             BendingPlayer modPlayer = Main.LocalPlayer.GetModPlayer<BendingPlayer>();
 
             if (modPlayer.chosenStyle == BendingPlayer.BendingStyle.None)
@@ -122,6 +160,7 @@ namespace ATLAMod.UI.BendingScroll
         public void Show()
         {
             Visible = true;
+            inputBlockFrames = 15;
         }
 
         public void Hide()
@@ -131,10 +170,11 @@ namespace ATLAMod.UI.BendingScroll
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            if (Visible)
-            {
-                base.Draw(spriteBatch);
-            }
+            if (!Visible)            
+                return;
+
+            spriteBatch.Draw(whitePixel, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.Black * 0.6f);
+            base.Draw(spriteBatch);
         }
 
         public override void Update(GameTime gameTime)
@@ -142,6 +182,11 @@ namespace ATLAMod.UI.BendingScroll
             if (Visible)
             {
                 base.Update(gameTime);
+
+                if (inputBlockFrames > 0)
+                {
+                    inputBlockFrames--;
+                }
             }
         }
     }

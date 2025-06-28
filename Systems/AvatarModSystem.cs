@@ -8,6 +8,8 @@ using Terraria;
 using ATLAMod.UI.BendingScroll;
 using Terraria.UI;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System.Security.Cryptography.X509Certificates;
 
 namespace ATLAMod.Systems
 {
@@ -17,6 +19,8 @@ namespace ATLAMod.Systems
         public BendingMovesUI bendingMovesUI;
         private UserInterface bendingChooseInterface;
         private UserInterface bendingMovesInterface;
+
+        public static Texture2D WhitePixel;
 
         public override void Load()
         {
@@ -90,6 +94,32 @@ namespace ATLAMod.Systems
             bendingMovesInterface?.SetState(bendingMovesUI);
         }
 
+        public override void PreUpdatePlayers()
+        {
+            if (bendingChooseUI != null && bendingChooseUI.Visible)
+            {
+                Player player = Main.LocalPlayer;
+                player.controlUp = false;
+                player.controlDown = false;
+                player.controlLeft = false;
+                player.controlRight = false;
+                player.controlJump = false;
+                player.controlUseItem = false;
+                player.controlUseTile = false;
+                player.controlHook = false;
+                player.controlMount = false;
+                player.controlQuickHeal = false;
+                player.controlQuickMana = false;
+                player.controlSmart = false;
+                player.controlTorch = false;
+                player.controlInv = false;
+                player.releaseUseItem = false;
+                player.releaseUseTile = false;
+                player.controlThrow = false;
+                player.controlMap = false;
 
+                player.velocity = Vector2.Zero;
+            }             
+        }
     }
 }
