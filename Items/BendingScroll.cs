@@ -9,6 +9,8 @@ using Terraria;
 using ATLAMod.Systems.Players;
 using ATLAMod.Systems;
 using ATLAMod.UI.BendingScroll;
+using Terraria.Audio;
+using Steamworks;
 
 namespace ATLAMod.Items
 {
@@ -22,12 +24,17 @@ namespace ATLAMod.Items
             Item.useTime = 20;
             Item.useAnimation = 15;
             Item.useStyle = ItemUseStyleID.HoldUp;
-            Item.rare = ItemRarityID.Orange;
-            Item.UseSound = SoundID.Item69;
+            Item.rare = ItemRarityID.Orange;            
         }
 
         public override bool? UseItem(Player player)
         {
+            SoundEngine.PlaySound(new SoundStyle("ATLAMod/Assets/Sounds/paperNoise1")
+            {
+                Volume = 2f,
+                Pitch = 0.3f
+            });
+
             BendingPlayer modPlayer = player.GetModPlayer<BendingPlayer>();
 
             if (modPlayer.chosenStyle == BendingPlayer.BendingStyle.None)

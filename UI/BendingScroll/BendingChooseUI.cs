@@ -37,7 +37,7 @@ namespace ATLAMod.UI.BendingScroll
             blackOverlay.Left.Set(0, 0f);
             blackOverlay.Top.Set(0, 0f);
             blackOverlay.ImageScale = 10000;
-            blackOverlay.Color = Color.Black * 0.75f;
+            blackOverlay.Color = Color.Black * 0.65f;
             Append(blackOverlay);
 
             scrollPanel = new UIImage(ModContent.Request<Texture2D>("ATLAMod/Assets/UITextures/choosebackgroundTEST"));
@@ -84,13 +84,16 @@ namespace ATLAMod.UI.BendingScroll
 
             button.OnMouseOver += (_, _) =>
             {
-                glowImage.SetVisibility(1f, 1f);
-                SoundEngine.PlaySound(SoundID.Item4);
+                glowImage.SetVisibility(1f, 1f);                
             };
 
             button.OnMouseOut += (_, _) =>
             {
                 glowImage.SetVisibility(0f, 0f);
+            };
+
+            button.OnLeftMouseDown += (_, _) =>
+            {                
             };
 
             container.Append(button);
