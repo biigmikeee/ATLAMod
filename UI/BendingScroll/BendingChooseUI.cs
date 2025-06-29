@@ -20,7 +20,7 @@ namespace ATLAMod.UI.BendingScroll
     public class BendingChooseUI : UIState
     {
         private int inputBlockFrames = 0;
-        private Texture2D whitePixel = null;
+        private UIImage blackOverlay;
 
         public bool Visible;
         private UIImage scrollPanel;
@@ -31,6 +31,14 @@ namespace ATLAMod.UI.BendingScroll
         private UIElement airButton;
         public override void OnInitialize()
         {
+            blackOverlay = new UIImage(ModContent.Request<Texture2D>("ATLAMod/Assets/UITextures/whitePixel"));
+            blackOverlay.Width.Set(Main.screenWidth, 0f);
+            blackOverlay.Height.Set(Main.screenHeight, 0f);
+            blackOverlay.Left.Set(0, 0f);
+            blackOverlay.Top.Set(0, 0f);
+            blackOverlay.ImageScale = 10000;
+            blackOverlay.Color = Color.Black * 0.75f;
+            Append(blackOverlay);
 
             scrollPanel = new UIImage(ModContent.Request<Texture2D>("ATLAMod/Assets/UITextures/choosebackgroundTEST"));
             scrollPanel.Left.Set((Main.screenWidth - 450) / 2f, 0f);
@@ -50,15 +58,6 @@ namespace ATLAMod.UI.BendingScroll
 
             airButton = CreateBendingButton("Air", 490f, ChooseAir);
             scrollPanel.Append(airButton);
-        }
-
-        public override void OnActivate()
-        {
-            if (whitePixel == null)
-            {
-                Main.NewText("hello");
-                whitePixel = ModContent.Request<Texture2D>($"ATLAMod/Assets/UITextures/whitePixel").Value;
-            }
         }
 
         private UIElement CreateBendingButton(string styleName, float top, UIElement.MouseEvent clickAction)
@@ -172,8 +171,7 @@ namespace ATLAMod.UI.BendingScroll
         {
             if (!Visible)            
                 return;
-
-            spriteBatch.Draw(whitePixel, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.Black * 0.6f);
+            
             base.Draw(spriteBatch);
         }
 
