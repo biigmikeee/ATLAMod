@@ -11,8 +11,10 @@ using ATLAMod.Systems;
 using ATLAMod.UI.BendingScroll;
 using Terraria.Audio;
 using Steamworks;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
 
-namespace ATLAMod.Items
+namespace ATLAMod.Items.BendingScroll
 {
     public class BendingScroll : ModItem
     {
@@ -23,13 +25,13 @@ namespace ATLAMod.Items
             Item.height = 36;
             Item.useTime = 20;
             Item.useAnimation = 15;
-            Item.useStyle = ItemUseStyleID.HoldUp;
-            Item.rare = ItemRarityID.Orange;            
+            Item.useStyle = ItemUseStyleID.Shoot;
+            Item.rare = ItemRarityID.Orange;
         }
 
         public override bool? UseItem(Player player)
         {
-            SoundEngine.PlaySound(new SoundStyle("ATLAMod/Assets/Sounds/paperNoise1")
+            SoundEngine.PlaySound(new SoundStyle("ATLAMod/Assets/Sounds/SoundEffects/paperNoise2")
             {
                 Volume = 2f,
                 Pitch = 0.3f
@@ -51,8 +53,13 @@ namespace ATLAMod.Items
                     ModContent.GetInstance<AvatarModSystem>().ShowBendingMovesUI();
                 }
             }
-            
+
             return true;
-        }    
+        }
+
+        public override Vector2? HoldoutOffset()
+        {
+            return new Vector2(-8f, 6f);
+        }
     }
 }

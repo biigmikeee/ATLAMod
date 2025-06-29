@@ -72,6 +72,7 @@ namespace ATLAMod.UI.BendingScroll
             var button = new UIImageButton(buttonTexture);
             button.Width.Set(180, 0f);
             button.Height.Set(120, 0f);
+            button.SetVisibility(1f, 1f);
             button.OnLeftClick += clickAction;
 
             var glowTexture = ModContent.Request<Texture2D>($"ATLAMod/Assets/UITextures/choosebuttoniconhoverTEST");
@@ -93,7 +94,8 @@ namespace ATLAMod.UI.BendingScroll
             };
 
             button.OnLeftMouseDown += (_, _) =>
-            {                
+            {
+                SoundEngine.PlaySound(new SoundStyle("ATLAMod/Assets/Sounds/SoundEffects/bigWoosh1"));
             };
 
             container.Append(button);
