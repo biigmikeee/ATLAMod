@@ -8,6 +8,8 @@
 		
 	</PropertyGroup>
 	<ItemGroup>
+	  <None Remove="Assets\UITextures\bendingChooseUI\bendingChooseUIbackground.png" />
+	  <None Remove="Assets\UITextures\bendingChooseUI\bendingChooseUIbuttonFire.png" />
 	  <None Remove="Assets\UITextures\choosebackgroundTEST.png" />
 	  <None Remove="Assets\UITextures\choosebuttoniconhoverTEST.png" />
 	  <None Remove="Assets\UITextures\choosebuttoniconTEST.png" />

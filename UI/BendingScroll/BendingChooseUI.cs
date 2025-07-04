@@ -19,6 +19,7 @@ namespace ATLAMod.UI.BendingScroll
 {
     public class BendingChooseUI : UIState
     {
+        private int buttonHoverCooldownFrames = 0;
         private int inputBlockFrames = 0;
         private UIImage blackOverlay;
 
@@ -37,66 +38,74 @@ namespace ATLAMod.UI.BendingScroll
             blackOverlay.Left.Set(0, 0f);
             blackOverlay.Top.Set(0, 0f);
             blackOverlay.ImageScale = 10000;
-            blackOverlay.Color = Color.Black * 0.65f;
+            blackOverlay.Color = Color.Black * 0.55f;
             Append(blackOverlay);
 
-            scrollPanel = new UIImage(ModContent.Request<Texture2D>("ATLAMod/Assets/UITextures/choosebackgroundTEST"));
+            scrollPanel = new UIImage(ModContent.Request<Texture2D>("ATLAMod/Assets/UITextures/bendingChooseUI/bendingChooseUIbackground"));
             scrollPanel.Left.Set((Main.screenWidth - 450) / 2f, 0f);
             scrollPanel.Top.Set((Main.screenHeight - 700) / 2f, 0f);
             scrollPanel.Width.Set(450, 0f);
             scrollPanel.Height.Set(700, 0f);
             Append(scrollPanel);
 
-            fireButton = CreateBendingButton("Fire", 70f, ChooseFire);
+            fireButton = CreateBendingButton("Fire", 20f, ChooseFire);
             scrollPanel.Append(fireButton);
 
-            waterButton = CreateBendingButton("Water", 210f, ChooseWater);
+            waterButton = CreateBendingButton("Water", 190f, ChooseWater);
             scrollPanel.Append(waterButton);
 
-            earthButton = CreateBendingButton("Earth", 350f, ChooseEarth);
+            earthButton = CreateBendingButton("Earth", 360f, ChooseEarth);
             scrollPanel.Append(earthButton);
 
-            airButton = CreateBendingButton("Air", 490f, ChooseAir);
+            airButton = CreateBendingButton("Air", 530f, ChooseAir);
             scrollPanel.Append(airButton);
         }
 
         private UIElement CreateBendingButton(string styleName, float top, UIElement.MouseEvent clickAction)
         {
             var container = new UIElement();
-            container.Width.Set(180, 0f);
-            container.Height.Set(120, 0f);
-            container.Left.Set((450 - 140) / 2f, 0f);
+            container.Width.Set(230, 0f);
+            container.Height.Set(150, 0f);
+            container.Left.Set((380 - 140) / 2f, 0f);
             container.Top.Set(top, 0f);
 
-            var buttonTexture = ModContent.Request<Texture2D>($"ATLAMod/Assets/UITextures/choosebuttoniconTEST");
+            var buttonTexture = ModContent.Request<Texture2D>($"ATLAMod/Assets/UITextures/bendingChooseUI/bendingChooseUIbuttonFire");
             var button = new UIImageButton(buttonTexture);
-            button.Width.Set(180, 0f);
-            button.Height.Set(120, 0f);
-            button.SetVisibility(1f, 1f);
-            button.OnLeftClick += clickAction;
+            button.Width.Set(230, 0f);
+            button.Height.Set(150, 0f);
+            button.SetVisibility(1f, 1f);            
 
-            var glowTexture = ModContent.Request<Texture2D>($"ATLAMod/Assets/UITextures/choosebuttoniconhoverTEST");
-            var glowImage = new UIImageButton(glowTexture);
-            glowImage.Width.Set(10, 0f);
-            glowImage.Height.Set(120, 0f);
+            var glowTexture = ModContent.Request<Texture2D>($"ATLAMod/Assets/UITextures/bendingChooseUI/bendingChooseUIbuttonGlowFire", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+            var glowImage = new glowButton(glowTexture);
+            glowImage.Width.Set(glowTexture.Width, 0f);
+            glowImage.Height.Set(glowTexture.Height, 0f);
             glowImage.Left.Set(0f, 0f);
             glowImage.Top.Set(0f, 0f);
-            glowImage.SetVisibility(0f, 0f);
-
+            glowImage.IgnoresMouseInteraction = true;
+            
             button.OnMouseOver += (_, _) =>
             {
-                glowImage.SetVisibility(1f, 1f);                
+                if (buttonHoverCooldownFrames == 0)
+                {
+                    buttonHoverCooldownFrames = 80;
+                    glowImage.FadeIn();
+                    SoundEngine.PlaySound(new SoundStyle("ATLAMod/Assets/Sounds/SoundEffects/smallFireWoosh1"));
+                }
             };
 
             button.OnMouseOut += (_, _) =>
             {
-                glowImage.SetVisibility(0f, 0f);
+                glowImage.FadeOut();
             };
 
             button.OnLeftMouseDown += (_, _) =>
             {
-                SoundEngine.PlaySound(new SoundStyle("ATLAMod/Assets/Sounds/SoundEffects/bigWoosh1"));
-            };
+                if(buttonHoverCooldownFrames == 0)
+                {
+                    SoundEngine.PlaySound(new SoundStyle("ATLAMod/Assets/Sounds/SoundEffects/bigWoosh1"));
+                    button.OnLeftClick += clickAction;
+                }                
+            };            
 
             container.Append(button);
             container.Append(glowImage);
@@ -189,6 +198,11 @@ namespace ATLAMod.UI.BendingScroll
                 if (inputBlockFrames > 0)
                 {
                     inputBlockFrames--;
+                }
+
+                if (buttonHoverCooldownFrames > 0)
+                {
+                    buttonHoverCooldownFrames--;
                 }
             }
         }
