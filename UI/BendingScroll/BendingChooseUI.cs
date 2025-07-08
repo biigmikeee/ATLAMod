@@ -79,8 +79,8 @@ namespace ATLAMod.UI.BendingScroll
             var glowImage = new glowButton(glowTexture);
             glowImage.Width.Set(glowTexture.Width, 0f);
             glowImage.Height.Set(glowTexture.Height, 0f);
-            glowImage.Left.Set(0f, 0f);
-            glowImage.Top.Set(0f, 0f);
+            glowImage.Left.Set(-2f, 0f);
+            glowImage.Top.Set(-2f, 0f);
             glowImage.IgnoresMouseInteraction = true;
             
             button.OnMouseOver += (_, _) =>
