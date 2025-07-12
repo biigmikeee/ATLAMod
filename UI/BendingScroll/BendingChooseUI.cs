@@ -69,13 +69,13 @@ namespace ATLAMod.UI.BendingScroll
             container.Left.Set((380 - 140) / 2f, 0f);
             container.Top.Set(top, 0f);
 
-            var buttonTexture = ModContent.Request<Texture2D>($"ATLAMod/Assets/UITextures/bendingChooseUI/bendingChooseUIbuttonFire");
+            var buttonTexture = ModContent.Request<Texture2D>($"ATLAMod/Assets/UITextures/bendingChooseUI/bendingChooseUIbutton{styleName}");
             var button = new UIImageButton(buttonTexture);
             button.Width.Set(230, 0f);
             button.Height.Set(150, 0f);
             button.SetVisibility(1f, 1f);            
 
-            var glowTexture = ModContent.Request<Texture2D>($"ATLAMod/Assets/UITextures/bendingChooseUI/bendingChooseUIbuttonGlowFire", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+            var glowTexture = ModContent.Request<Texture2D>($"ATLAMod/Assets/UITextures/bendingChooseUI/bendingChooseUIbuttonGlow{styleName}", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
             var glowImage = new glowButton(glowTexture);
             glowImage.Width.Set(glowTexture.Width, 0f);
             glowImage.Height.Set(glowTexture.Height, 0f);
@@ -89,7 +89,21 @@ namespace ATLAMod.UI.BendingScroll
                 {
                     buttonHoverCooldownFrames = 80;
                     glowImage.FadeIn();
-                    SoundEngine.PlaySound(new SoundStyle("ATLAMod/Assets/Sounds/SoundEffects/smallFireWoosh1"));
+                    switch (styleName)
+                    {
+                        case "Fire":
+                            SoundEngine.PlaySound(new SoundStyle("ATLAMod/Assets/Sounds/SoundEffects/smallFireWoosh1"));
+                            break;
+                        case "Water":
+                            SoundEngine.PlaySound(new SoundStyle("ATLAMod/Assets/Sounds/SoundEffects/shortWave1"));
+                            break;
+                        case "Earth":
+                            SoundEngine.PlaySound(new SoundStyle("ATLAMod/Assets/Sounds/SoundEffects/earthRumbleSmall"));
+                            break;
+                        case "Air":
+                            SoundEngine.PlaySound(new SoundStyle("ATLAMod/Assets/Sounds/SoundEffects/airWooshMedium"));
+                            break;
+                    }                    
                 }
             };
 

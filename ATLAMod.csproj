@@ -9,6 +9,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="Assets\UITextures\bendingChooseUI\bendingChooseUIbackground.png" />
+	  <None Remove="Assets\UITextures\bendingChooseUI\bendingChooseUIbuttonAir.png" />
 	  <None Remove="Assets\UITextures\bendingChooseUI\bendingChooseUIbuttonEarth.png" />
 	  <None Remove="Assets\UITextures\bendingChooseUI\bendingChooseUIbuttonFire.png" />
 	  <None Remove="Assets\UITextures\bendingChooseUI\bendingChooseUIbuttonGlowEarth.png" />

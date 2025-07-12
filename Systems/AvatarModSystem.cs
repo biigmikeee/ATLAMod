@@ -16,7 +16,10 @@ namespace ATLAMod.Systems
     public class AvatarModSystem : ModSystem
     {
         public BendingChooseUI bendingChooseUI;
-        public BendingMovesUI bendingMovesUI;
+        public BendingMovesUIFire bendingMovesUIFire;
+        public BendingMovesUIWater bendingMovesUIWater;
+        public BendingMovesUIEarth bendingMovesUIEarth;
+        public BendingMovesUIAir bendingMovesUIAir;
         private UserInterface bendingChooseInterface;
         private UserInterface bendingMovesInterface;
 
@@ -27,10 +30,13 @@ namespace ATLAMod.Systems
             if (!Main.dedServ)
             {
                 bendingChooseUI = new BendingChooseUI();
-                bendingMovesUI = new BendingMovesUI();
+                bendingMovesUIFire = new BendingMovesUIFire();
+                bendingMovesUIWater = new BendingMovesUIWater();
+                bendingMovesUIEarth = new BendingMovesUIEarth();
+                bendingMovesUIAir = new BendingMovesUIAir();
 
                 bendingChooseInterface = new UserInterface();
-                bendingMovesInterface = new UserInterface();
+                bendingMovesFireInterface = new UserInterface();
 
                 bendingChooseUI.Activate();
                 bendingMovesUI.Activate();
