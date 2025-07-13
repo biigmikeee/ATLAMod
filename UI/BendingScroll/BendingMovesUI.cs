@@ -9,10 +9,11 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria;
 using Terraria.UI;
+using ATLAMod.Systems.Players;
 
 namespace ATLAMod.UI.BendingScroll
 {
-    public class BendingMovesUIFire : UIState
+    public class BendingMovesUI : UIState
     {
         public bool Visible;
 
@@ -20,7 +21,7 @@ namespace ATLAMod.UI.BendingScroll
         private UIImage blackOverlay;
         private UIImage scrollPanel;
 
-
+        private BendingPlayer.BendingStyle currentStyle;
         public override void OnInitialize()
         {
             blackOverlay = new UIImage(ModContent.Request<Texture2D>("ATLAMod/Assets/UITextures/whitePixel"));
@@ -39,9 +40,49 @@ namespace ATLAMod.UI.BendingScroll
             scrollPanel.Height.Set(700, 0f);
             Append(scrollPanel);
 
-            Main.NewText("EarthMovesUI");
         }
 
+        public void SetStyle(BendingPlayer.BendingStyle style)
+        {
+            currentStyle = style;
+            scrollPanel.RemoveAllChildren();
+
+            switch (style)
+            {
+                case BendingPlayer.BendingStyle.Fire:
+                    LoadFireMoves();
+                    break;
+                case BendingPlayer.BendingStyle.Water:
+                    LoadWaterMoves();
+                    break;
+                case BendingPlayer.BendingStyle.Earth:
+                    LoadEarthMoves();
+                    break;
+                case BendingPlayer.BendingStyle.Air:
+                    LoadAirMoves();
+                    break;
+            }
+        }
+
+        private void LoadFireMoves()
+        {
+            Main.NewText("firemoves");
+        }
+
+        private void LoadWaterMoves()
+        {
+            Main.NewText("watermoves");
+        }
+
+        private void LoadEarthMoves()
+        {
+            Main.NewText("earthmoves");
+        }
+
+        private void LoadAirMoves()
+        {
+            Main.NewText("airmoves");
+        }
         public override void Draw(SpriteBatch spriteBatch)
         {
             if (Visible)

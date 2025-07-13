@@ -10,16 +10,14 @@ using Terraria.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Security.Cryptography.X509Certificates;
+using ATLAMod.Systems.Players;
 
 namespace ATLAMod.Systems
 {
     public class AvatarModSystem : ModSystem
     {
         public BendingChooseUI bendingChooseUI;
-        public BendingMovesUIFire bendingMovesUIFire;
-        public BendingMovesUIWater bendingMovesUIWater;
-        public BendingMovesUIEarth bendingMovesUIEarth;
-        public BendingMovesUIAir bendingMovesUIAir;
+        public BendingMovesUI bendingMovesUI;
         private UserInterface bendingChooseInterface;
         private UserInterface bendingMovesInterface;
 
@@ -30,13 +28,10 @@ namespace ATLAMod.Systems
             if (!Main.dedServ)
             {
                 bendingChooseUI = new BendingChooseUI();
-                bendingMovesUIFire = new BendingMovesUIFire();
-                bendingMovesUIWater = new BendingMovesUIWater();
-                bendingMovesUIEarth = new BendingMovesUIEarth();
-                bendingMovesUIAir = new BendingMovesUIAir();
+                bendingMovesUI = new BendingMovesUI();
 
                 bendingChooseInterface = new UserInterface();
-                bendingMovesFireInterface = new UserInterface();
+                bendingMovesInterface = new UserInterface();
 
                 bendingChooseUI.Activate();
                 bendingMovesUI.Activate();
@@ -94,8 +89,9 @@ namespace ATLAMod.Systems
             bendingChooseInterface?.SetState(bendingChooseUI);           
         }
 
-        public void ShowBendingMovesUI()
+        public void ShowBendingMovesUI(BendingPlayer.BendingStyle style)
         {
+            bendingMovesUI.SetStyle(style);
             bendingMovesUI.Show();
             bendingMovesInterface?.SetState(bendingMovesUI);
         }

@@ -48,13 +48,10 @@ namespace ATLAMod.Items.BendingScroll
             }
             else
             {
-                if(modPlayer.hasLearnedFire == true)
+                if (!ModContent.GetInstance<AvatarModSystem>().bendingMovesUI.Visible)
                 {
-                    if (!ModContent.GetInstance<AvatarModSystem>().bendingMovesUIFire.Visible)
-                    {
-                        ModContent.GetInstance<AvatarModSystem>().ShowBendingMovesUI();
-                    }
-                }                
+                    ModContent.GetInstance<AvatarModSystem>().ShowBendingMovesUI(modPlayer.chosenStyle);
+                }            
             }
 
             return true;
