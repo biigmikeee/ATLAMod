@@ -92,7 +92,14 @@ namespace ATLAMod.UI.BendingScroll
         public override void Update(GameTime gameTime)
         {
             if (Visible)
+            {
+                if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape))
+                {
+                    Hide();
+                }
+
                 base.Update(gameTime);
+            }
         }
 
         public void Show()

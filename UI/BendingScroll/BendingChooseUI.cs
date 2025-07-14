@@ -87,7 +87,7 @@ namespace ATLAMod.UI.BendingScroll
             {
                 if (buttonHoverCooldownFrames == 0)
                 {
-                    buttonHoverCooldownFrames = 80;
+                    buttonHoverCooldownFrames = 60;
                     glowImage.FadeIn();
                     switch (styleName)
                     {

@@ -123,5 +123,11 @@ namespace ATLAMod.Systems
                 player.velocity = Vector2.Zero;
             }             
         }
+
+        public override void OnWorldUnload()
+        {
+            bendingChooseUI?.Hide();
+            bendingMovesUI?.Hide();
+        }
     }
 }
