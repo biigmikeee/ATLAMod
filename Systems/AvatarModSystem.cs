@@ -11,22 +11,32 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Security.Cryptography.X509Certificates;
 using ATLAMod.Systems.Players;
+using ATLAMod.UI.BreathMeter;
 
 namespace ATLAMod.Systems
 {
     public class AvatarModSystem : ModSystem
     {
+
+        //BENDINGCHOOSEUI+BENDINGMOVESUI INTERFACES
         public BendingChooseUI bendingChooseUI;
         public BendingMovesUI bendingMovesUI;
         private UserInterface bendingChooseInterface;
         private UserInterface bendingMovesInterface;
 
+        //BREATHMETER - FIREBENDER INTERFACES
+        public BreathMeter breathMeter;
+        private UserInterface breathMeterInterface;
+
+
         public static Texture2D WhitePixel;
+
 
         public override void Load()
         {
             if (!Main.dedServ)
             {
+                //BENDINGCHOOSEUI+BENDINGMOVESUI
                 bendingChooseUI = new BendingChooseUI();
                 bendingMovesUI = new BendingMovesUI();
 
@@ -35,19 +45,39 @@ namespace ATLAMod.Systems
 
                 bendingChooseUI.Activate();
                 bendingMovesUI.Activate();
+
+                //BREATHMETER
+                breathMeter = new BreathMeter();
+                breathMeterInterface = new UserInterface();
+                breathMeter.Activate();
+                breathMeterInterface.SetState(breathMeter);
             }
         }
 
         public override void UpdateUI(GameTime gameTime)
         {
+
+            //BENDINGCHOOSEUI
             if (bendingChooseUI.Visible)
             {
                 bendingChooseInterface?.Update(gameTime);
             }
 
+            //BENDINGMOVESUI
             if (bendingMovesUI.Visible)
             {
                 bendingMovesInterface?.Update(gameTime);
+            }
+
+            //BREATHMETER
+            if (Main.LocalPlayer.GetModPlayer<BendingPlayer>().hasLearnedFire == true)
+            {
+                breathMeter.Visible = true;
+                breathMeterInterface?.Update(gameTime);
+            }
+            else
+            {
+                breathMeter.Visible = false;
             }
         }
 
@@ -57,6 +87,8 @@ namespace ATLAMod.Systems
 
             if (mouseTextIndex != -1)
             {
+
+                //BENDINGCHOOSEUI
                 if (bendingChooseUI.Visible)
                 {
                     layers.Insert(mouseTextIndex, new LegacyGameInterfaceLayer(
@@ -69,6 +101,7 @@ namespace ATLAMod.Systems
                         InterfaceScaleType.UI));
                 }
 
+                //BENDINGMOVESUI
                 if (bendingMovesUI.Visible)
                 {
                     layers.Insert(mouseTextIndex, new LegacyGameInterfaceLayer(
@@ -78,6 +111,18 @@ namespace ATLAMod.Systems
                             bendingMovesInterface?.Draw(Main.spriteBatch, new GameTime());
                             return true;
                         },
+                        InterfaceScaleType.UI));
+                }
+
+                if (breathMeter.Visible)
+                {
+                    layers.Insert(mouseTextIndex, new LegacyGameInterfaceLayer(
+                        "AvatarMod: Breath Meter UI",
+                        () =>
+                    {
+                        breathMeterInterface.Draw(Main.spriteBatch, new GameTime());
+                        return true;
+                    },
                         InterfaceScaleType.UI));
                 }
             }

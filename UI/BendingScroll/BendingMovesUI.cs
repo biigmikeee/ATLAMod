@@ -67,6 +67,8 @@ namespace ATLAMod.UI.BendingScroll
         private void LoadFireMoves()
         {
             Main.NewText("firemoves");
+
+
         }
 
         private void LoadWaterMoves()

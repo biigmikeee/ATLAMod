@@ -10,6 +10,7 @@ using ATLAMod;
 using ATLAMod.Buffs.BendingStyles;
 using ATLAMod.UI.BendingScroll;
 using System.Security.Cryptography.X509Certificates;
+using Terraria.GameInput;
 
 namespace ATLAMod.Systems.Players
 {
@@ -25,7 +26,12 @@ namespace ATLAMod.Systems.Players
         public bool hasLearnedAir = false;
 
         public bool hasChosenBending;
-        //private bool uiShown = false;
+
+        //FIREBENDING BREATH METER
+        public float maxBreath = 1f;
+        public float breath = 1f;
+        public bool takenBreath = false;
+        public int breathRegenTimer = 0;
 
         public override void Initialize()
         {
@@ -83,6 +89,51 @@ namespace ATLAMod.Systems.Players
                 {
                     Player.AddBuff(ModContent.BuffType<airbenderBuff>(), 2);
                 }
+            }
+
+            if (chosenStyle != BendingStyle.Fire)
+            {
+                return;
+            }
+
+            if (breathRegenTimer > 0)
+            {
+                takenBreath = true;
+                breathRegenTimer--;
+            }
+            else
+            {
+                takenBreath = false;
+            }
+
+            float regenRate = takenBreath ? 40f : 5f;
+            breath += regenRate * (1f / 60f);
+            breath = Utils.Clamp(breath, 0, maxBreath);
+        }
+
+        public void ConsumeBreath(float amount)
+        {
+            breath = Math.Max(0, breath - amount);
+        }
+
+        public bool HasEnoughBreath(float amount)
+        {
+            return breath >= amount;
+        }
+
+        public override void ProcessTriggers(TriggersSet triggersSet)
+        {
+            if (ATLAMod.UseBreathKeyBind.JustPressed)
+            {
+                ConsumeBreath(0.8f);
+                Main.NewText("BREATHUSED - " + breath);
+            }
+
+            if (ATLAMod.BreatheKeybind.JustPressed)
+            {
+                breathRegenTimer = 120;
+                breath = Math.Min(1f, breath + 0.25f);
+                Main.NewText("TOOKBREATH - " + breath);
             }
         }
     }

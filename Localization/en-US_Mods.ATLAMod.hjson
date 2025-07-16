@@ -31,3 +31,8 @@ Items: {
 		Tooltip: ""
 	}
 }
+
+Keybinds: {
+	"Use Breath TEST.DisplayName": Use  Breath  T E S T
+	Breathe.DisplayName: Breathe
+}
