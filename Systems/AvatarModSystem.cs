@@ -84,6 +84,7 @@ namespace ATLAMod.Systems
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
             int mouseTextIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
+            int behindInventory = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Invasion Progress Bars"));
 
             if (mouseTextIndex != -1)
             {
@@ -116,7 +117,7 @@ namespace ATLAMod.Systems
 
                 if (breathMeter.Visible)
                 {
-                    layers.Insert(mouseTextIndex, new LegacyGameInterfaceLayer(
+                    layers.Insert(behindInventory, new LegacyGameInterfaceLayer(
                         "AvatarMod: Breath Meter UI",
                         () =>
                     {

@@ -95,20 +95,6 @@ namespace ATLAMod.Systems.Players
             {
                 return;
             }
-
-            if (breathRegenTimer > 0)
-            {
-                takenBreath = true;
-                breathRegenTimer--;
-            }
-            else
-            {
-                takenBreath = false;
-            }
-
-            float regenRate = takenBreath ? 40f : 5f;
-            breath += regenRate * (1f / 60f);
-            breath = Utils.Clamp(breath, 0, maxBreath);
         }
 
         public void ConsumeBreath(float amount)
@@ -130,8 +116,7 @@ namespace ATLAMod.Systems.Players
             }
 
             if (ATLAMod.BreatheKeybind.JustPressed)
-            {
-                breathRegenTimer = 120;
+            {               
                 breath = Math.Min(1f, breath + 0.25f);
                 Main.NewText("TOOKBREATH - " + breath);
             }
