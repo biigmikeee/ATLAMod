@@ -111,7 +111,7 @@ namespace ATLAMod.Systems.Players
         {
             if (ATLAMod.UseBreathKeyBind.JustPressed)
             {
-                ConsumeBreath(0.8f);
+                ConsumeBreath(0.1f);
                 Main.NewText("BREATHUSED - " + breath);
             }
 

@@ -47,10 +47,8 @@ namespace ATLAMod.UI.BreathMeter
         public override void Update(GameTime gameTime)
         {
             var player = Main.LocalPlayer.GetModPlayer<BendingPlayer>();
-            fillPercent = MathHelper.Clamp(player.breath / player.maxBreath, 0f, 1f);
 
-            breathFill.Width.Set(breathBorder.Width.Pixels * fillPercent, 0f);
-
+            fillPercent = player.breath;
             base.Update(gameTime);
         }
         public override void Draw(SpriteBatch spriteBatch)
