@@ -91,15 +91,54 @@ namespace ATLAMod.Systems.Players
                 }
             }
 
-            if (chosenStyle != BendingStyle.Fire)
+            if (hasLearnedFire)
             {
-                return;
+                HandleBreathRegeneration();
             }
         }
 
+        private void HandleBreathRegeneration()
+        {
+            //breathregen constants (mightchange)
+            const int REGEN_DELAY_TICKS = 120; // 2 second regen delay
+            const float REGEN_RATE = 0.008f; //default regen rate
+            const float REGEN_FAST_RATE = 0.015f; //when breathing, regenfaster
+
+            if (takenBreath)
+            {
+                breathRegenTimer = 0;
+                takenBreath = false;
+            }
+
+            if (breath < maxBreath)
+            {
+                breathRegenTimer++;
+
+                //checking if we're breathing
+                bool activelyBreathing = ATLAMod.BreatheKeybind.Current;
+
+                if (activelyBreathing)
+                {
+                    breath = Math.Min(maxBreath, breath + REGEN_FAST_RATE);
+                }
+                else if (breathRegenTimer >= REGEN_DELAY_TICKS)
+                {
+                    breath = Math.Min(maxBreath, breath + REGEN_RATE);
+                }
+            }
+            else
+            {
+                breathRegenTimer = 0;
+            }
+
+        }
         public void ConsumeBreath(float amount)
         {
-            breath = Math.Max(0, breath - amount);
+            if (breath >= amount)
+            {
+                breath = Math.Max(0, breath - amount);
+                takenBreath = true;
+            }
         }
 
         public bool HasEnoughBreath(float amount)
@@ -107,19 +146,37 @@ namespace ATLAMod.Systems.Players
             return breath >= amount;
         }
 
-        public override void ProcessTriggers(TriggersSet triggersSet)
+        // this is to check if breath CAN be consumed
+        public bool TryConsumeBreath(float amount)
         {
-            if (ATLAMod.UseBreathKeyBind.JustPressed)
+            if (HasEnoughBreath(amount))
             {
-                ConsumeBreath(0.1f);
-                Main.NewText("BREATHUSED - " + breath);
+                ConsumeBreath(amount);
+                return true;
+            }
+            return false;
+        }
+
+        public override void ProcessTriggers(TriggersSet triggerSet)
+        {
+            if (!hasLearnedFire)
+            {
+                return;
             }
 
-            if (ATLAMod.BreatheKeybind.JustPressed)
-            {               
-                breath = Math.Min(1f, breath + 0.25f);
-                Main.NewText("TOOKBREATH - " + breath);
-            }
+            if (ATLAMod.UseBreathKeyBind.JustPressed)
+            {
+                float breathCost = 0.1f;
+
+                if (TryConsumeBreath(breathCost))
+                {
+                    Main.NewText($"BREATHUSED - " + breath);
+                }
+                else
+                {
+                    Main.NewText("NOT ENOUH BREATH");
+                }
+            }                        
         }
     }
 }
