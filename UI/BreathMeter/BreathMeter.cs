@@ -24,10 +24,10 @@ namespace ATLAMod.UI.BreathMeter
         public bool Visible;
         public float fillPercent = 1f;
 
-        private const float UI_LEFT = 510f;
-        private const float UI_TOP = 24f;
-        private const float UI_WIDTH = 140f;
-        private const float UI_HEIGHT = 40f;
+        private const float UI_LEFT = 500f;
+        private const float UI_TOP = 22f;
+        private const float UI_WIDTH = 144f;
+        private const float UI_HEIGHT = 46f;
 
 
         public override void OnInitialize()
@@ -35,7 +35,7 @@ namespace ATLAMod.UI.BreathMeter
             //background layer
             breathBack = new UIImage(ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/BreathMeterBack"));
             breathBack.Left.Set(UI_LEFT, 0f);
-            breathBack.Top.Set(UI_TOP, 0f);
+            breathBack.Top.Set(UI_TOP + 2, 0f);
             breathBack.Width.Set(UI_WIDTH, 0f);
             breathBack.Height.Set(UI_HEIGHT, 0f);
             Append(breathBack);
@@ -50,7 +50,7 @@ namespace ATLAMod.UI.BreathMeter
             Append(breathFillContainer);
 
             //breathFill bar (clipped by container)
-            breathFill = new UIImage(ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/BreathFill"));
+            breathFill = new UIImage(ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/BreathFillNew"));
             breathFill.Left.Set(0f, 0f); //relative to container
             breathFill.Top.Set(0f, 0f); // relative to container
             breathFill.Width.Set(UI_WIDTH, 0f);
@@ -58,7 +58,7 @@ namespace ATLAMod.UI.BreathMeter
             breathFillContainer.Append(breathFill);
 
             // border
-            breathBorder = new UIImage(ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/BreathMeter"));
+            breathBorder = new UIImage(ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/BreathMeterNew"));
             breathBorder.Left.Set(UI_LEFT, 0f);
             breathBorder.Top.Set(UI_TOP, 0f);
             Append(breathBorder);
@@ -78,6 +78,10 @@ namespace ATLAMod.UI.BreathMeter
             float lerpSpeed = 8;
             float newWidth = MathHelper.Lerp(currentWidth, targetWidth, lerpSpeed);
             breathFillContainer.Width.Set(newWidth, 0f);
+
+            //handle breathe animation, (make the fill bar glow when breathing, using breath)
+
+            //handle notenoughbreath animation, (shake screen?, shake meter?, flash?, darken?)
 
             base.Update(gameTime);
         }

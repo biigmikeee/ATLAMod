@@ -100,13 +100,15 @@ namespace ATLAMod.Systems.Players
         private void HandleBreathRegeneration()
         {
             //breathregen constants (mightchange)
-            const int REGEN_DELAY_TICKS = 120; // 2 second regen delay
-            const float REGEN_RATE = 0.008f; //default regen rate
-            const float REGEN_FAST_RATE = 0.015f; //when breathing, regenfaster
+            const int REGEN_DELAY_TICKS = 180; // 3 second regen delay
+            const float REGEN_RATE = 0.0008f; //default regen rate
+            const float REGEN_FAST_RATE = 0.004f; //when breathing, regenfaster
+            int breatheTimer = 60;
 
             if (takenBreath)
             {
                 breathRegenTimer = 0;
+                breatheTimer = 0;
                 takenBreath = false;
             }
 
@@ -117,11 +119,16 @@ namespace ATLAMod.Systems.Players
                 //checking if we're breathing
                 bool activelyBreathing = ATLAMod.BreatheKeybind.Current;
 
-                if (activelyBreathing)
+                if (activelyBreathing && breatheTimer == 60)
                 {
-                    breath = Math.Min(maxBreath, breath + REGEN_FAST_RATE);
+                    while (breatheTimer > 0)
+                    {                        
+                        breath = Math.Min(maxBreath, breath + REGEN_FAST_RATE);
+                        breatheTimer--;
+                    }
+                    
                 }
-                else if (breathRegenTimer >= REGEN_DELAY_TICKS)
+                else if(breathRegenTimer >= REGEN_DELAY_TICKS)
                 {
                     breath = Math.Min(maxBreath, breath + REGEN_RATE);
                 }
@@ -130,14 +137,12 @@ namespace ATLAMod.Systems.Players
             {
                 breathRegenTimer = 0;
             }
-
         }
         public void ConsumeBreath(float amount)
         {
             if (breath >= amount)
             {
-                breath = Math.Max(0, breath - amount);
-                takenBreath = true;
+                breath = Math.Max(0, breath - amount);                
             }
         }
 
@@ -164,6 +169,7 @@ namespace ATLAMod.Systems.Players
                 return;
             }
 
+            //TESTING FOR USING BREATH
             if (ATLAMod.UseBreathKeyBind.JustPressed)
             {
                 float breathCost = 0.1f;
