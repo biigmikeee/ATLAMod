@@ -18,6 +18,7 @@ namespace ATLAMod.UI.BreathMeter
     {
         private UIImage breathBorder;
         private UIImage breathFill;
+        private UIImage breathFillGlow;
         private UIElement breathFillContainer;
         private UIImage breathBack;
 
@@ -29,7 +30,7 @@ namespace ATLAMod.UI.BreathMeter
         private const float UI_WIDTH = 144f;
         private const float UI_HEIGHT = 46f;
 
-
+        private float animationTimer = 0f;
         public override void OnInitialize()
         {
             //background layer
@@ -57,6 +58,14 @@ namespace ATLAMod.UI.BreathMeter
             breathFill.Height.Set(UI_HEIGHT, 0f);
             breathFillContainer.Append(breathFill);
 
+            breathFillGlow = new UIImage(ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/BreathFillNew"));
+            breathFillGlow.Left.Set(0f, 0f); //relative to container
+            breathFillGlow.Top.Set(0f, 0f); // relative to container
+            breathFillGlow.Width.Set(UI_WIDTH, 0f);
+            breathFillGlow.Height.Set(UI_HEIGHT, 0f);
+            breathFillGlow.Color = Color.Transparent;
+            breathFillContainer.Append(breathFillGlow);
+
             // border
             breathBorder = new UIImage(ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/BreathMeterNew"));
             breathBorder.Left.Set(UI_LEFT, 0f);
@@ -69,6 +78,8 @@ namespace ATLAMod.UI.BreathMeter
             var player = Main.LocalPlayer.GetModPlayer<BendingPlayer>();
             fillPercent = player.breath;
 
+            animationTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
             //updating breathfillcontainer based on percentage
             breathFillContainer.Width.Set(UI_WIDTH * fillPercent, 0f);
 
@@ -80,10 +91,48 @@ namespace ATLAMod.UI.BreathMeter
             breathFillContainer.Width.Set(newWidth, 0f);
 
             //handle breathe animation, (make the fill bar glow when breathing, using breath)
+            UpdateGlowEffect(player);
 
             //handle notenoughbreath animation, (shake screen?, shake meter?, flash?, darken?)
 
+
             base.Update(gameTime);
+        }
+
+        private void UpdateGlowEffect(BendingPlayer player)
+        {
+            Color glowColor = Color.White;
+
+            bool shouldGlow = false;
+            float pulseSpeed = 2f;
+
+            if (player.isActivelyBreathing)
+            {
+                shouldGlow = true;
+                pulseSpeed = 6f;
+            }
+
+            else if(player.breathRegenTimer >= 180 && player.breath < player.maxBreath)
+            {
+                shouldGlow = true;
+                pulseSpeed = 2f;
+            }
+
+            if (shouldGlow)
+            {
+                float pulseIntensity = 0.5f + 0.5f * (float)Math.Sin(animationTimer * pulseSpeed);
+
+                float maxOpacity = 0.6f;
+                float glowOpacity = pulseIntensity * maxOpacity;
+
+                breathFillGlow.Color = Color.White * glowOpacity;
+            }
+            else
+            {
+                breathFillGlow.Color = Color.Transparent;
+            }
+
+            breathFill.Color = glowColor;
         }
         public override void Draw(SpriteBatch spriteBatch)
         {

@@ -129,10 +129,7 @@ namespace ATLAMod.Systems.Players
 
                 //checking if we're breathing
                 bool activelyBreathing = ATLAMod.BreatheKeybind.Current;
-                if (activelyBreathing)
-                {
-                    Main.NewText($"BREATHING" + "breathTimer: " + breatheTimer + "breatheCooldownTimer: " + breatheCooldownTimer);
-                }
+
                 //can only breathe if timer is at 60 and not in cooldown
                 if (activelyBreathing && breatheTimer >= 0 && breatheCooldownTimer == 0)
                 {
@@ -140,7 +137,7 @@ namespace ATLAMod.Systems.Players
                     {
                         isActivelyBreathing = true;
                         activeBreathingDuration = 0;
-                        Main.NewText("BREATHING"); //indication of breathing - changing this to visual meter effects later
+                        //indication of breathing - changing this to visual meter effects later
                     }
 
                     //continuing breathing and handling timers
@@ -194,7 +191,7 @@ namespace ATLAMod.Systems.Players
                 if(breatheCooldownTimer == 0)
                 {
                     breatheTimer = 60;
-                    Main.NewText("YOU CAN BREATHE AGAIN"); //CHANGE THIS - maybe a sound or visual or something.
+                    //CHANGE THIS - maybe a sound or visual or something.
                 }
             }
         }

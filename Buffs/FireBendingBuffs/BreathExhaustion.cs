@@ -20,11 +20,6 @@ namespace ATLAMod.Buffs.FireBendingBuffs
             BuffID.Sets.LongerExpertDebuff[Type] = false;
         }
 
-        public override void Update(Player player, ref int buffIndex)
-        {
-            Main.NewText("BREATHEXHAUSTION DEBUFF");
-        }
-
         public override bool RightClick(int buffIndex)
         {
             return false;
