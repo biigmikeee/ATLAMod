@@ -23,6 +23,11 @@ Buffs: {
 		DisplayName: Waterbender
 		Description: You are a Waterbender
 	}
+
+	BreathExhaustion: {
+		DisplayName: Breath Exhaustion
+		Description: Mods.ATLAMod.Buffs.BreathExhaustion.Description
+	}
 }
 
 Items: {

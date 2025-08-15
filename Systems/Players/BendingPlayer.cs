@@ -11,6 +11,7 @@ using ATLAMod.Buffs.BendingStyles;
 using ATLAMod.UI.BendingScroll;
 using System.Security.Cryptography.X509Certificates;
 using Terraria.GameInput;
+using ATLAMod.Buffs.FireBendingBuffs;
 
 namespace ATLAMod.Systems.Players
 {
@@ -32,10 +33,14 @@ namespace ATLAMod.Systems.Players
         public float breath = 1f;
         public bool takenBreath = false;
         public int breathRegenTimer = 0;
-
+        public int breatheTimer = 60;
+        public int breatheCooldownTimer = 0;
+        public bool isActivelyBreathing = false;
+        public int activeBreathingDuration = 0;
         public override void Initialize()
         {
             hasChosenBending = false;
+            breatheTimer = 60;
         }
 
         public override void SaveData(TagCompound tag)
@@ -55,6 +60,9 @@ namespace ATLAMod.Systems.Players
             hasLearnedWater = tag.GetBool("hasLearnedWater");
             hasLearnedEarth = tag.GetBool("hasLearnedEarth");
             hasLearnedAir = tag.GetBool("hasLearnedAir");
+
+            breath = tag.GetFloat("breath");
+            breatheTimer = tag.GetInt("breatheTimer");
         }
 
         public override void PostUpdate()
@@ -94,6 +102,7 @@ namespace ATLAMod.Systems.Players
             if (hasLearnedFire)
             {
                 HandleBreathRegeneration();
+                HandleBreatheCooldown();
             }
         }
 
@@ -103,12 +112,10 @@ namespace ATLAMod.Systems.Players
             const int REGEN_DELAY_TICKS = 180; // 3 second regen delay
             const float REGEN_RATE = 0.0008f; //default regen rate
             const float REGEN_FAST_RATE = 0.004f; //when breathing, regenfaster
-            int breatheTimer = 60;
 
             if (takenBreath)
             {
                 breathRegenTimer = 0;
-                breatheTimer = 0;
                 takenBreath = false;
             }
 
@@ -119,16 +126,32 @@ namespace ATLAMod.Systems.Players
                 //checking if we're breathing
                 bool activelyBreathing = ATLAMod.BreatheKeybind.Current;
 
-                if (activelyBreathing && breatheTimer == 60)
+                //can only breathe if timer is at 60 and not in cooldown
+                if (activelyBreathing && breatheTimer == 60 && breatheCooldownTimer == 0)
                 {
-                    while (breatheTimer > 0)
-                    {                        
-                        breath = Math.Min(maxBreath, breath + REGEN_FAST_RATE);
-                        breatheTimer--;
+                    if (!isActivelyBreathing)
+                    {
+                        isActivelyBreathing = true;
+                        activeBreathingDuration = 0;
+                        Main.NewText("BREATHING"); //indication of breathing - changing this to visual meter effects later
                     }
+
+                    //continuing breathing and handling timers
+                    breath = Math.Min(maxBreath, breath + REGEN_FAST_RATE);
+                    breatheTimer--;
+                    activeBreathingDuration++;
                     
+                    //timer reaches 0 and starts cooldown
+                    if (breatheTimer <= 0)
+                    {
+                        StopActiveBreathing();
+                    }
                 }
-                else if(breathRegenTimer >= REGEN_DELAY_TICKS)
+                else if (isActivelyBreathing) //player released key or ran out of time
+                {                    
+                    StopActiveBreathing();
+                }
+                else if(breathRegenTimer >= REGEN_DELAY_TICKS) //passive regen - slow rate after delay
                 {
                     breath = Math.Min(maxBreath, breath + REGEN_RATE);
                 }
@@ -136,13 +159,44 @@ namespace ATLAMod.Systems.Players
             else
             {
                 breathRegenTimer = 0;
+                if (isActivelyBreathing)
+                {
+                    StopActiveBreathing();
+                }
+            }
+        }
+
+        private void StopActiveBreathing()
+        {
+            if (isActivelyBreathing)
+            {
+                isActivelyBreathing = false;
+
+                breatheCooldownTimer = 300; //5 seconds
+
+                Player.AddBuff(ModContent.BuffType<BreathExhaustion>(), breatheCooldownTimer); //ADD BUFF
+            }
+        }
+
+        private void HandleBreatheCooldown()
+        {
+            if (breatheCooldownTimer > 0)
+            {
+                breatheCooldownTimer--;
+
+                if(breatheCooldownTimer == 0)
+                {
+                    breatheTimer = 60;
+                    Main.NewText("YOU CAN BREATHE AGAIN"); //CHANGE THIS - maybe a sound or visual or something.
+                }
             }
         }
         public void ConsumeBreath(float amount)
         {
             if (breath >= amount)
             {
-                breath = Math.Max(0, breath - amount);                
+                breath = Math.Max(0, breath - amount);
+                takenBreath = true;
             }
         }
 
