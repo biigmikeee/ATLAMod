@@ -17,6 +17,7 @@ namespace ATLAMod.UI.BreathMeter
     public class BreathMeter : UIState
     {
         private UIImage breathBorder;
+        private UIImage breathBorderGlow;
         private UIImage breathFill;
         private UIImage breathFillGlow;
         private UIElement breathFillContainer;
@@ -58,13 +59,22 @@ namespace ATLAMod.UI.BreathMeter
             breathFill.Height.Set(UI_HEIGHT, 0f);
             breathFillContainer.Append(breathFill);
 
-            breathFillGlow = new UIImage(ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/BreathFillNew"));
+            breathFillGlow = new UIImage(ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/BreathFillGlowTEST"));
             breathFillGlow.Left.Set(0f, 0f); //relative to container
             breathFillGlow.Top.Set(0f, 0f); // relative to container
             breathFillGlow.Width.Set(UI_WIDTH, 0f);
             breathFillGlow.Height.Set(UI_HEIGHT, 0f);
             breathFillGlow.Color = Color.Transparent;
             breathFillContainer.Append(breathFillGlow);
+
+            //border passive glow
+            breathBorderGlow = new UIImage(ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/BreathMeterPassiveGlow"));
+            breathBorderGlow.Left.Set(UI_LEFT - 6, 0f);
+            breathBorderGlow.Top.Set(UI_TOP - 4, 0f);
+            breathBorderGlow.Width.Set(156f, 0f);
+            breathBorderGlow.Height.Set(50f, 0f);
+            breathBorderGlow.Color = Color.Transparent;
+            Append(breathBorderGlow);
 
             // border
             breathBorder = new UIImage(ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/BreathMeterNew"));
@@ -87,42 +97,43 @@ namespace ATLAMod.UI.BreathMeter
             float targetWidth = UI_WIDTH * fillPercent;
             float currentWidth = breathFillContainer.Width.Pixels;
             float lerpSpeed = 8;
-            float newWidth = MathHelper.Lerp(currentWidth, targetWidth, lerpSpeed);
+            float newWidth = MathHelper.Lerp(currentWidth, targetWidth, lerpSpeed * (float)Main.frameRate);
             breathFillContainer.Width.Set(newWidth, 0f);
 
             //handle breathe animation, (make the fill bar glow when breathing, using breath)
             UpdateGlowEffect(player);
-
-            //handle notenoughbreath animation, (shake screen?, shake meter?, flash?, darken?)
+            UpdatePassiveRegenGlow(player);
+            
 
 
             base.Update(gameTime);
         }
 
+        //FILLBAR GLOW EFFECTS
         private void UpdateGlowEffect(BendingPlayer player)
         {
             Color glowColor = Color.White;
 
             bool shouldGlow = false;
-            float pulseSpeed = 2f;
+            float pulseSpeed = 4f;
 
             if (player.isActivelyBreathing)
             {
                 shouldGlow = true;
-                pulseSpeed = 6f;
+                pulseSpeed = 8f;
             }
 
             else if(player.breathRegenTimer >= 180 && player.breath < player.maxBreath)
             {
                 shouldGlow = true;
-                pulseSpeed = 2f;
+                pulseSpeed = 4f;
             }
 
             if (shouldGlow)
             {
                 float pulseIntensity = 0.5f + 0.5f * (float)Math.Sin(animationTimer * pulseSpeed);
 
-                float maxOpacity = 0.6f;
+                float maxOpacity = 0.45f;
                 float glowOpacity = pulseIntensity * maxOpacity;
 
                 breathFillGlow.Color = Color.White * glowOpacity;
@@ -134,6 +145,44 @@ namespace ATLAMod.UI.BreathMeter
 
             breathFill.Color = glowColor;
         }
+
+        //BORDER EFFECTS - PASSIVE, FULL, ACTIVE BREATHING
+
+        //PASSIVE BORDER GLOW HANDLING
+        private void UpdatePassiveRegenGlow(BendingPlayer player)
+        {            
+            if (player.breathRegenTimer >= 180 && player.breath < player.maxBreath)
+            {
+                float pulse = 0.5f + 0.5f * (float)Math.Sin(animationTimer * 4f);
+                Color glowColor = Color.Orange;
+                float glowOpacity = MathHelper.Lerp(0.15f, 0.55f, pulse);
+
+                breathBorderGlow.Color = glowColor * glowOpacity;
+                SpawnPassiveRegenParticles();
+            }
+            else
+            {
+                breathBorderGlow.Color = Color.Transparent;
+            }
+        }
+        //HANDLES PARTICLES FOR PASSIVEBORDERGLOW
+        private void SpawnPassiveRegenParticles()
+        {
+            if (Main.rand.NextFloat() < 1f)
+            {
+                Vector2 position = new Vector2(
+                    breathBorderGlow.Left.Pixels + Main.rand.NextFloat(breathBorderGlow.Width.Pixels),
+                    breathBorderGlow.Top.Pixels + Main.rand.NextFloat(breathBorderGlow.Height.Pixels));
+
+                int dustIndex = Dust.NewDust(position, 2, 2, 6);
+                Main.dust[dustIndex].velocity *= 0.1f;
+                Main.dust[dustIndex].scale = 0.5f;
+                Main.dust[dustIndex].fadeIn = 0.5f;
+                Main.dust[dustIndex].noGravity = true;
+            }
+        }
+
+
         public override void Draw(SpriteBatch spriteBatch)
         {
             if (!Visible)
