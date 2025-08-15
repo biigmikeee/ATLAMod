@@ -50,6 +50,9 @@ namespace ATLAMod.Systems.Players
             tag["hasLearnedWater"] = hasLearnedWater;
             tag["hasLearnedEarth"] = hasLearnedEarth;
             tag["hasLearnedAir"] = hasLearnedAir;
+
+            tag["breath"] = breath;
+            tag["maxBreath"] = maxBreath;
         }
 
         public override void LoadData(TagCompound tag)
@@ -63,6 +66,10 @@ namespace ATLAMod.Systems.Players
 
             breath = tag.GetFloat("breath");
             breatheTimer = tag.GetInt("breatheTimer");
+
+            breatheTimer = 60;
+            breatheCooldownTimer = 0;
+            isActivelyBreathing = false;
         }
 
         public override void PostUpdate()
@@ -73,6 +80,9 @@ namespace ATLAMod.Systems.Players
                 {
                     Player.AddBuff(ModContent.BuffType<firebenderBuff>(), 2);
                 }
+
+                HandleBreathRegeneration();
+                HandleBreatheCooldown();
             }
 
             if (hasLearnedWater)
@@ -98,12 +108,6 @@ namespace ATLAMod.Systems.Players
                     Player.AddBuff(ModContent.BuffType<airbenderBuff>(), 2);
                 }
             }
-
-            if (hasLearnedFire)
-            {
-                HandleBreathRegeneration();
-                HandleBreatheCooldown();
-            }
         }
 
         private void HandleBreathRegeneration()
@@ -125,9 +129,12 @@ namespace ATLAMod.Systems.Players
 
                 //checking if we're breathing
                 bool activelyBreathing = ATLAMod.BreatheKeybind.Current;
-
+                if (activelyBreathing)
+                {
+                    Main.NewText($"BREATHING" + "breathTimer: " + breatheTimer + "breatheCooldownTimer: " + breatheCooldownTimer);
+                }
                 //can only breathe if timer is at 60 and not in cooldown
-                if (activelyBreathing && breatheTimer == 60 && breatheCooldownTimer == 0)
+                if (activelyBreathing && breatheTimer >= 0 && breatheCooldownTimer == 0)
                 {
                     if (!isActivelyBreathing)
                     {
