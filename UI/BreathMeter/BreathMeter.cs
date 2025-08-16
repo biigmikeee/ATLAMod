@@ -22,7 +22,7 @@ namespace ATLAMod.UI.BreathMeter
         private float borderGlowFrameTimer = 0f;
         private int borderGlowFrame = 0;
         private int borderGlowFrameCount = 7;
-        private float borderGlowFrameSpeed = 0f;
+        private float borderGlowFrameSpeed = 0.1f;
 
         private UIImage breathFill;
         private UIImage breathFillGlow;
@@ -178,11 +178,11 @@ namespace ATLAMod.UI.BreathMeter
             base.Draw(spriteBatch);
 
             if (showPassiveGlow)
-            {
+            {                
                 int frameWidth = breathBorderGlow.Width;
                 int frameHeight = breathBorderGlow.Height / borderGlowFrameCount;
 
-                Rectangle sourceRect = new Rectangle(borderGlowFrame * frameWidth, 0, frameWidth, frameHeight);
+                Rectangle sourceRect = new Rectangle(0, borderGlowFrame * frameHeight, frameWidth, frameHeight);
 
                 Vector2 position = new Vector2(UI_LEFT - 5, UI_TOP - 5);
                 spriteBatch.Draw(breathBorderGlow, position, sourceRect, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
