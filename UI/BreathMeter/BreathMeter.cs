@@ -19,10 +19,10 @@ namespace ATLAMod.UI.BreathMeter
         private UIImage breathBorder;
 
         private Texture2D breathBorderGlow;
-        private float borderGlowFrameTimer = 0f;
         private int borderGlowFrame = 0;
-        private int borderGlowFrameCount = 7;
-        private float borderGlowFrameSpeed = 0.1f;
+        private int borderGlowTimer = 0;
+        private const int borderGlowSpeed = 10;
+        private const int borderGlowFrameCount = 7;
 
         private UIImage breathFill;
         private UIImage breathFillGlow;
@@ -37,7 +37,7 @@ namespace ATLAMod.UI.BreathMeter
         private const float UI_WIDTH = 144f;
         private const float UI_HEIGHT = 46f;
 
-        private float animationTimer = 0f;
+        private float glowTimer = 0f;
         public override void OnInitialize()
         {
             //background layer
@@ -87,7 +87,7 @@ namespace ATLAMod.UI.BreathMeter
             var player = Main.LocalPlayer.GetModPlayer<BendingPlayer>();
             fillPercent = player.breath;
 
-            animationTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            glowTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             //updating breathfillcontainer based on percentage
             breathFillContainer.Width.Set(UI_WIDTH * fillPercent, 0f);
@@ -95,15 +95,28 @@ namespace ATLAMod.UI.BreathMeter
             //smoothing animation (dontknowifiwantthisyet)
             float targetWidth = UI_WIDTH * fillPercent;
             float currentWidth = breathFillContainer.Width.Pixels;
-            float lerpSpeed = 8;
-            float newWidth = MathHelper.Lerp(currentWidth, targetWidth, lerpSpeed * (float)Main.frameRate);
+            float lerpSpeed = 8f * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            float newWidth = MathHelper.Lerp(currentWidth, targetWidth, lerpSpeed);
             breathFillContainer.Width.Set(newWidth, 0f);
 
             //handle breathe animation, (make the fill bar glow when breathing, using breath)
             UpdateGlowEffect(player);
-            UpdatePassiveRegenGlow(player);
             
-
+            //handling passive regen animation -----------------------------------------------------
+            if (player.breathRegenTimer >= 180 && player.breath < player.maxBreath)
+            {
+                borderGlowTimer++;
+                if(borderGlowTimer >= borderGlowSpeed)
+                {
+                    borderGlowTimer = 0;
+                    borderGlowFrame = (borderGlowFrame + 1) % borderGlowFrameCount;
+                }
+            }
+            else
+            {
+                borderGlowFrame = 0;
+                borderGlowTimer = 0;
+            }            
 
             base.Update(gameTime);
         }
@@ -130,7 +143,7 @@ namespace ATLAMod.UI.BreathMeter
 
             if (shouldGlow)
             {
-                float pulseIntensity = 0.5f + 0.5f * (float)Math.Sin(animationTimer * pulseSpeed);
+                float pulseIntensity = 0.5f + 0.5f * (float)Math.Sin(glowTimer * pulseSpeed);
 
                 float maxOpacity = 0.45f;
                 float glowOpacity = pulseIntensity * maxOpacity;
@@ -144,31 +157,7 @@ namespace ATLAMod.UI.BreathMeter
 
             breathFill.Color = glowColor;
         }
-
-        //BORDER EFFECTS - PASSIVE, FULL, ACTIVE BREATHING
-
-        //PASSIVE BORDER GLOW HANDLING
-
-        private bool showPassiveGlow = false;
-        private void UpdatePassiveRegenGlow(BendingPlayer player)
-        {            
-            if (player.breathRegenTimer >= 180 && player.breath < player.maxBreath)
-            {
-                showPassiveGlow = true;
-
-                borderGlowFrameTimer += (float)Main.gameTimeCache.ElapsedGameTime.TotalSeconds;
-                if (borderGlowFrameTimer >= borderGlowFrameSpeed)
-                {
-                    borderGlowFrameTimer -= borderGlowFrameSpeed;
-                    borderGlowFrame = (borderGlowFrame + 1) % borderGlowFrameCount;
-                }
-            }
-            else
-            {
-                showPassiveGlow = false;
-            }
-        }
-
+                
         public override void Draw(SpriteBatch spriteBatch)
         {
             if (!Visible)
@@ -177,15 +166,22 @@ namespace ATLAMod.UI.BreathMeter
             }
             base.Draw(spriteBatch);
 
-            if (showPassiveGlow)
-            {                
-                int frameWidth = breathBorderGlow.Width;
-                int frameHeight = breathBorderGlow.Height / borderGlowFrameCount;
+            var player = Main.LocalPlayer.GetModPlayer<BendingPlayer>();
 
-                Rectangle sourceRect = new Rectangle(0, borderGlowFrame * frameHeight, frameWidth, frameHeight);
+            Vector2 testPos = new Vector2(UI_LEFT - 5, UI_TOP - 5);
 
-                Vector2 position = new Vector2(UI_LEFT - 5, UI_TOP - 5);
-                spriteBatch.Draw(breathBorderGlow, position, sourceRect, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            var borderTexture = ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/BreathMeterNew").Value;
+            spriteBatch.Draw(borderTexture, testPos, Color.Red * 0.5f);
+
+            if (player.breathRegenTimer >= 180 && player.breath < player.maxBreath)
+            {
+                Main.NewText("SHOULDANIMATE");
+                spriteBatch.Draw(breathBorderGlow, new Vector2(testPos.X + 200, testPos.Y), Color.Green * 0.8f);
+
+                int frameHeight = 68;
+                int actualFrameHeight = 66;
+                Rectangle sourceRect = new Rectangle(0, borderGlowFrame * frameHeight, 164, actualFrameHeight);
+                spriteBatch.Draw(breathBorderGlow, testPos, sourceRect, Color.Blue * 0.8f);
             }
 
         }
