@@ -24,8 +24,11 @@
 	  <None Remove="Buffs\FireBendingBuffs\BreathExhaustion.png" />
 	  <None Remove="Items\BendingScroll.png" />
 	  <None Remove="UI\BreathMeter\BreathFill.png" />
+	  <None Remove="UI\BreathMeter\BreathFillGlowTEST.png" />
+	  <None Remove="UI\BreathMeter\BreathFillTEST.png" />
 	  <None Remove="UI\BreathMeter\BreathMeter.png" />
 	  <None Remove="UI\BreathMeter\BreathMeterBack.png" />
+	  <None Remove="UI\BreathMeter\BreathMeterPassiveGlow.png" />
 	</ItemGroup>
 
 	<!-- References -->
