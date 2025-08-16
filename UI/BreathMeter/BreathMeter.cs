@@ -18,11 +18,11 @@ namespace ATLAMod.UI.BreathMeter
     {
         private UIImage breathBorder;
 
-        private UIImage breathBorderGlow;
+        private Texture2D breathBorderGlow;
         private float borderGlowFrameTimer = 0f;
         private int borderGlowFrame = 0;
         private int borderGlowFrameCount = 7;
-        private float borderGlowFrameSpeed = 0.15f;
+        private float borderGlowFrameSpeed = 0f;
 
         private UIImage breathFill;
         private UIImage breathFillGlow;
@@ -71,16 +71,9 @@ namespace ATLAMod.UI.BreathMeter
             breathFillGlow.Width.Set(UI_WIDTH, 0f);
             breathFillGlow.Height.Set(UI_HEIGHT, 0f);
             breathFillGlow.Color = Color.Transparent;
-            breathFillContainer.Append(breathFillGlow);
+            breathFillContainer.Append(breathFillGlow);      
 
-            //border passive glow
-            breathBorderGlow = new UIImage(ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/BreathMeterPassiveGlowAnimated"));
-            breathBorderGlow.Left.Set(UI_LEFT - 5, 0f);
-            breathBorderGlow.Top.Set(UI_TOP - 5, 0f);
-            breathBorderGlow.Width.Set(164f, 0f);
-            breathBorderGlow.Height.Set(66f, 0f);
-            breathBorderGlow.Color = Color.Transparent;
-            Append(breathBorderGlow);
+            breathBorderGlow = ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/BreathMeterPassiveGlowAnimated").Value;
 
             // border
             breathBorder = new UIImage(ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/BreathMeterNew"));
@@ -155,44 +148,26 @@ namespace ATLAMod.UI.BreathMeter
         //BORDER EFFECTS - PASSIVE, FULL, ACTIVE BREATHING
 
         //PASSIVE BORDER GLOW HANDLING
+
+        private bool showPassiveGlow = false;
         private void UpdatePassiveRegenGlow(BendingPlayer player)
         {            
             if (player.breathRegenTimer >= 180 && player.breath < player.maxBreath)
             {
-                breathBorderGlow.Color = Color.White;
+                showPassiveGlow = true;
 
                 borderGlowFrameTimer += (float)Main.gameTimeCache.ElapsedGameTime.TotalSeconds;
-                if(borderGlowFrameTimer >= borderGlowFrameSpeed)
+                if (borderGlowFrameTimer >= borderGlowFrameSpeed)
                 {
                     borderGlowFrameTimer -= borderGlowFrameSpeed;
-                    borderGlowFrame = (borderGlowFrame + 1) % borderGlowFrameCount;                    
+                    borderGlowFrame = (borderGlowFrame + 1) % borderGlowFrameCount;
                 }
             }
             else
             {
-                breathBorderGlow.Color = Color.Transparent;
+                showPassiveGlow = false;
             }
         }
-        //HANDLES PARTICLES FOR PASSIVEBORDERGLOW
-/*        private void SpawnPassiveRegenParticles()
-        {
-            if (Main.rand.NextFloat() < 0.5f)
-            {
-                float x = Main.LocalPlayer.Center.X - 150 + Main.rand.NextFloat(0, 156);
-                float y = Main.LocalPlayer.Center.Y - 250 + Main.rand.NextFloat(0, 50);
-
-                Vector2 position = new Vector2(x, y);
-
-                Dust dust = Dust.NewDustDirect(position, 2, 2, 6);
-
-                dust.velocity = new Vector2(Main.rand.NextFloat(-0.5f, 0.5f), Main.rand.NextFloat(-0.8f, -0.2f));
-                dust.scale = Main.rand.NextFloat(0.4f, 0.7f);
-                dust.fadeIn = 0.5f;
-                dust.noGravity = true;
-                dust.alpha = 50;
-            }
-        }*/
-
 
         public override void Draw(SpriteBatch spriteBatch)
         {
@@ -201,6 +176,17 @@ namespace ATLAMod.UI.BreathMeter
                 return;
             }
             base.Draw(spriteBatch);
+
+            if (showPassiveGlow)
+            {
+                int frameWidth = breathBorderGlow.Width;
+                int frameHeight = breathBorderGlow.Height / borderGlowFrameCount;
+
+                Rectangle sourceRect = new Rectangle(borderGlowFrame * frameWidth, 0, frameWidth, frameHeight);
+
+                Vector2 position = new Vector2(UI_LEFT - 5, UI_TOP - 5);
+                spriteBatch.Draw(breathBorderGlow, position, sourceRect, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
+            }
 
         }
     }
