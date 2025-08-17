@@ -35,6 +35,7 @@ namespace ATLAMod.UI.BreathMeter
         private readonly int idleEndFrame = 18;
         private readonly int endStartFrame = 19;
         private readonly int endEndFrame = 22;
+        private int idleSoundTimer = 0;
 
         private UIImage breathFill;
         private UIImage breathFillGlow;
@@ -119,6 +120,13 @@ namespace ATLAMod.UI.BreathMeter
                 {
                     glowState = GlowAnimState.Starting;
                     borderGlowFrame = startStartFrame;
+
+                    //playing initial whoosh sound
+                    SoundEngine.PlaySound(new SoundStyle("ATLAMod/Assets/Sounds/SoundEffects/igniteSmall")
+                    {
+                        Volume = 0.2f,
+                        Pitch = 0.1f
+                    });
                 }
             }
             else
@@ -166,6 +174,25 @@ namespace ATLAMod.UI.BreathMeter
                         }
                         break;
                 }
+            }
+
+            //idle sound handling
+            if (glowState == GlowAnimState.Idle)
+            {
+                idleSoundTimer++;
+                if(idleSoundTimer >= 60)
+                {
+                    SoundEngine.PlaySound(new SoundStyle("ATLAMod/Assets/Sounds/SoundEffects/fireIdle")
+                    {
+                        Volume = 0.2f,
+                        PitchVariance = 0.2f
+                    });
+                    idleSoundTimer = 0;
+                }
+            }
+            else
+            {
+                idleSoundTimer = 0;
             }
     //handling passive regen glow ^^^ ----------------------------------------------------------
 
