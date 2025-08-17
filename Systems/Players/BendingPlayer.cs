@@ -29,8 +29,8 @@ namespace ATLAMod.Systems.Players
         public bool hasChosenBending;
 
         //FIREBENDING BREATH METER
-        public float maxBreath = 1f;
-        public float breath = 1f;
+        public float maxBreath = 100;
+        public float breath = 100;
         public bool takenBreath = false;
         public int breathRegenTimer = 0;
         public int breatheTimer = 60;
@@ -114,8 +114,8 @@ namespace ATLAMod.Systems.Players
         {
             //breathregen constants (mightchange)
             const int REGEN_DELAY_TICKS = 180; // 3 second regen delay
-            const float REGEN_RATE = 0.0008f; //default regen rate
-            const float REGEN_FAST_RATE = 0.004f; //when breathing, regenfaster
+            const float REGEN_RATE = 0.08f; //default regen rate
+            const float REGEN_FAST_RATE = 0.4f; //when breathing, regenfaster
 
             if (takenBreath)
             {
@@ -230,7 +230,7 @@ namespace ATLAMod.Systems.Players
             //TESTING FOR USING BREATH
             if (ATLAMod.UseBreathKeyBind.JustPressed)
             {
-                float breathCost = 0.1f;
+                float breathCost = 5f;
 
                 if (TryConsumeBreath(breathCost))
                 {

@@ -43,7 +43,7 @@ namespace ATLAMod.UI.BreathMeter
         private UIImage breathBack;
 
         public bool Visible;
-        public float fillPercent = 1f;
+        public float fillPercent = 100;
 
         private const float UI_LEFT = 500f;
         private const float UI_TOP = 22f;
@@ -96,7 +96,7 @@ namespace ATLAMod.UI.BreathMeter
         public override void Update(GameTime gameTime)
         {
             var player = Main.LocalPlayer.GetModPlayer<BendingPlayer>();
-            fillPercent = player.breath;
+            fillPercent = player.breath / player.maxBreath;
 
             glowTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -122,7 +122,7 @@ namespace ATLAMod.UI.BreathMeter
                     borderGlowFrame = startStartFrame;
 
                     //playing initial whoosh sound
-                    SoundEngine.PlaySound(new SoundStyle("ATLAMod/Assets/Sounds/SoundEffects/igniteSmall")
+                    SoundEngine.PlaySound(new SoundStyle("ATLAMod/Assets/Sounds/SoundEffects/igniteSmall1")
                     {
                         Volume = 0.2f,
                         Pitch = 0.1f
@@ -245,8 +245,7 @@ namespace ATLAMod.UI.BreathMeter
             base.Draw(spriteBatch);
 
 
-            var player = Main.LocalPlayer.GetModPlayer<BendingPlayer>();
-            //MORE FRAMES  SMOOTHER ANIMATION
+            var player = Main.LocalPlayer.GetModPlayer<BendingPlayer>();            
             var breathBorderGlow = ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/PassiveGlowFinal").Value;
 
             Vector2 position = new Vector2(UI_LEFT - 10, UI_TOP - 10);            
