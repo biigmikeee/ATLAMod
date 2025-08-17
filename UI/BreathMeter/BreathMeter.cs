@@ -17,12 +17,23 @@ namespace ATLAMod.UI.BreathMeter
     public class BreathMeter : UIState
     {
         private UIImage breathBorder;
-
-        private Texture2D breathBorderGlow;
+        
+        //THIS IS FOR PASSIVE REGEN GLOWING - may be overdoing this but idc
         private int borderGlowFrame = 0;
         private int borderGlowTimer = 0;
-        private const int borderGlowSpeed = 10;
-        private const int borderGlowFrameCount = 7;
+        private const int borderGlowSpeed = 6; //ADJUST SPEED BASED ON ANIMATION
+        private const int borderGlowFrameCount = 23;
+        private enum GlowAnimState
+        {
+            None, Starting, Idle, Ending
+        }
+        private GlowAnimState glowState = GlowAnimState.None;
+        private readonly int startStartFrame = 0;
+        private readonly int startEndFrame = 12;
+        private readonly int idleStartFrame = 13;
+        private readonly int idleEndFrame = 18;
+        private readonly int endStartFrame = 19;
+        private readonly int endEndFrame = 22;
 
         private UIImage breathFill;
         private UIImage breathFillGlow;
@@ -71,15 +82,13 @@ namespace ATLAMod.UI.BreathMeter
             breathFillGlow.Width.Set(UI_WIDTH, 0f);
             breathFillGlow.Height.Set(UI_HEIGHT, 0f);
             breathFillGlow.Color = Color.Transparent;
-            breathFillContainer.Append(breathFillGlow);      
-
-            breathBorderGlow = ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/BreathMeterPassiveGlowAnimated").Value;
+            breathFillContainer.Append(breathFillGlow);            
 
             // border
             breathBorder = new UIImage(ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/BreathMeterNew"));
             breathBorder.Left.Set(UI_LEFT, 0f);
             breathBorder.Top.Set(UI_TOP, 0f);
-            Append(breathBorder);
+            Append(breathBorder);            
         }
 
         public override void Update(GameTime gameTime)
@@ -102,21 +111,62 @@ namespace ATLAMod.UI.BreathMeter
             //handle breathe animation, (make the fill bar glow when breathing, using breath)
             UpdateGlowEffect(player);
             
-            //handling passive regen animation -----------------------------------------------------
+        //handling passive regen animation vvvvvv -----------------------------------------------------
             if (player.breathRegenTimer >= 180 && player.breath < player.maxBreath)
             {
-                borderGlowTimer++;
-                if(borderGlowTimer >= borderGlowSpeed)
+                if (glowState == GlowAnimState.None)
                 {
-                    borderGlowTimer = 0;
-                    borderGlowFrame = (borderGlowFrame + 1) % borderGlowFrameCount;
+                    glowState = GlowAnimState.Starting;
+                    borderGlowFrame = startStartFrame;
                 }
             }
             else
             {
-                borderGlowFrame = 0;
+                if (glowState == GlowAnimState.None)
+                {
+                    glowState = GlowAnimState.Ending;
+                    borderGlowFrame = endStartFrame;
+                }
+            }
+
+            borderGlowTimer++;
+            if(borderGlowTimer >= borderGlowSpeed)
+            {
                 borderGlowTimer = 0;
-            }            
+
+                switch (glowState)
+                {
+                    case GlowAnimState.Starting:
+                        if (borderGlowFrame < startEndFrame)
+                        {
+                            borderGlowFrame++;
+                        } 
+                        else
+                        {
+                            glowState = GlowAnimState.Idle;
+                            borderGlowFrame = idleStartFrame;
+                        }
+                        break;
+                    case GlowAnimState.Idle:
+                        borderGlowFrame++;
+                        if (borderGlowFrame > idleEndFrame)
+                        {
+                            borderGlowFrame = idleStartFrame;
+                        }
+                        break;
+                    case GlowAnimState.Ending:
+                        if (borderGlowFrame < endEndFrame)
+                        {
+                            borderGlowFrame++;
+                        }
+                        else
+                        {
+                            glowState = GlowAnimState.None;
+                        }
+                        break;
+                }
+            }
+    //handling passive regen glow ^^^ ----------------------------------------------------------
 
             base.Update(gameTime);
         }
@@ -166,22 +216,18 @@ namespace ATLAMod.UI.BreathMeter
             }
             base.Draw(spriteBatch);
 
+
             var player = Main.LocalPlayer.GetModPlayer<BendingPlayer>();
+            //MORE FRAMES  SMOOTHER ANIMATION
+            var breathBorderGlow = ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/PassiveGlowFinal").Value;
 
-            Vector2 testPos = new Vector2(UI_LEFT - 5, UI_TOP - 5);
-
-            var borderTexture = ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/BreathMeterNew").Value;
-            spriteBatch.Draw(borderTexture, testPos, Color.Red * 0.5f);
+            Vector2 position = new Vector2(UI_LEFT - 10, UI_TOP - 10);            
 
             if (player.breathRegenTimer >= 180 && player.breath < player.maxBreath)
-            {
-                Main.NewText("SHOULDANIMATE");
-                spriteBatch.Draw(breathBorderGlow, new Vector2(testPos.X + 200, testPos.Y), Color.Green * 0.8f);
-
-                int frameHeight = 68;
-                int actualFrameHeight = 66;
-                Rectangle sourceRect = new Rectangle(0, borderGlowFrame * frameHeight, 164, actualFrameHeight);
-                spriteBatch.Draw(breathBorderGlow, testPos, sourceRect, Color.Blue * 0.8f);
+            {                
+                int frameHeight = breathBorderGlow.Height / borderGlowFrameCount;                
+                Rectangle sourceRect = new Rectangle(0, borderGlowFrame * frameHeight, breathBorderGlow.Width, frameHeight - 2);
+                spriteBatch.Draw(breathBorderGlow, position, sourceRect, Color.White * 0.8f);
             }
 
         }
