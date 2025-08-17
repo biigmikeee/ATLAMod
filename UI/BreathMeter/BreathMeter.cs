@@ -10,6 +10,7 @@ using Terraria.UI;
 using Terraria.ModLoader;
 using ATLAMod.Systems.Players;
 using Microsoft.Xna.Framework;
+using Terraria.Audio;
 
 
 namespace ATLAMod.UI.BreathMeter
@@ -122,7 +123,7 @@ namespace ATLAMod.UI.BreathMeter
             }
             else
             {
-                if (glowState == GlowAnimState.None)
+                if (glowState != GlowAnimState.None && glowState != GlowAnimState.Ending)
                 {
                     glowState = GlowAnimState.Ending;
                     borderGlowFrame = endStartFrame;
@@ -223,7 +224,7 @@ namespace ATLAMod.UI.BreathMeter
 
             Vector2 position = new Vector2(UI_LEFT - 10, UI_TOP - 10);            
 
-            if (player.breathRegenTimer >= 180 && player.breath < player.maxBreath)
+            if (glowState != GlowAnimState.None)
             {                
                 int frameHeight = breathBorderGlow.Height / borderGlowFrameCount;                
                 Rectangle sourceRect = new Rectangle(0, borderGlowFrame * frameHeight, breathBorderGlow.Width, frameHeight - 2);
