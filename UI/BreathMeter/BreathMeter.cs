@@ -22,35 +22,48 @@ namespace ATLAMod.UI.BreathMeter
         //THIS IS FOR PASSIVE REGEN GLOWING - may be overdoing this but idc
         private int borderGlowFrame = 0;
         private int borderGlowTimer = 0;
-        private const int borderGlowSpeed = 6; //ADJUST SPEED BASED ON ANIMATION
-        private const int borderGlowFrameCount = 23;
-        private enum GlowAnimState
-        {
-            None, Starting, Idle, Ending
-        }
+        private const int borderGlowSpeed = 2; //ADJUST SPEED BASED ON ANIMATION
+        private const int borderGlowFrameCount = 34;
+        private enum GlowAnimState {None, Starting, Idle, Ending}
         private GlowAnimState glowState = GlowAnimState.None;
         private readonly int startStartFrame = 0;
-        private readonly int startEndFrame = 12;
-        private readonly int idleStartFrame = 13;
-        private readonly int idleEndFrame = 18;
-        private readonly int endStartFrame = 19;
-        private readonly int endEndFrame = 22;
-        private int idleSoundTimer = 0;
+        private readonly int startEndFrame = 10;
+        private readonly int idleStartFrame = 11;
+        private readonly int idleEndFrame = 23;
+        private readonly int endStartFrame = 24;
+        private readonly int endEndFrame = 33;        
 
+        //FOR ACTIVEBREATHING GLOW ANIMATION
+        private int abGlowFrame = 0;
+        private int abGlowTimer = 0;
+        private const int abGlowSpeed = 2;
+        private const int abGlowFrameCount = 24;
+        private GlowAnimState abGlowState = GlowAnimState.None;
+        private readonly int abStartStart = 0;
+        private readonly int abStartEnd = 10;
+        private readonly int abIdleStart = 11;
+        private readonly int abIdleEnd = 18;
+        private readonly int abEndStart = 19;
+        private readonly int abEndEnd = 23;
+
+        //Other breathmeter UI initializing
         private UIImage breathFill;
         private UIImage breathFillGlow;
         private UIElement breathFillContainer;
         private UIImage breathBack;
-
+        
         public bool Visible;
         public float fillPercent = 100;
 
+        //positioning and size for breathmeter
         private const float UI_LEFT = 500f;
         private const float UI_TOP = 22f;
         private const float UI_WIDTH = 144f;
         private const float UI_HEIGHT = 46f;
 
+        //not sure what this does
         private float glowTimer = 0f;
+
         public override void OnInitialize()
         {
             //background layer
@@ -78,6 +91,7 @@ namespace ATLAMod.UI.BreathMeter
             breathFill.Height.Set(UI_HEIGHT, 0f);
             breathFillContainer.Append(breathFill);
 
+            //breathing glow for BreathFill
             breathFillGlow = new UIImage(ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/BreathFillGlowTEST"));
             breathFillGlow.Left.Set(0f, 0f); //relative to container
             breathFillGlow.Top.Set(0f, 0f); // relative to container
@@ -112,94 +126,13 @@ namespace ATLAMod.UI.BreathMeter
 
             //handle breathe animation, (make the fill bar glow when breathing, using breath)
             UpdateGlowEffect(player);
-            
-        //handling passive regen animation vvvvvv -----------------------------------------------------
-            if (player.breathRegenTimer >= 180 && player.breath < player.maxBreath)
-            {
-                if (glowState == GlowAnimState.None)
-                {
-                    glowState = GlowAnimState.Starting;
-                    borderGlowFrame = startStartFrame;
-
-                    //playing initial whoosh sound
-                    SoundEngine.PlaySound(new SoundStyle("ATLAMod/Assets/Sounds/SoundEffects/igniteSmall1")
-                    {
-                        Volume = 0.2f,
-                        Pitch = 0.1f
-                    });
-                }
-            }
-            else
-            {
-                if (glowState != GlowAnimState.None && glowState != GlowAnimState.Ending)
-                {
-                    glowState = GlowAnimState.Ending;
-                    borderGlowFrame = endStartFrame;
-                }
-            }
-
-            borderGlowTimer++;
-            if(borderGlowTimer >= borderGlowSpeed)
-            {
-                borderGlowTimer = 0;
-
-                switch (glowState)
-                {
-                    case GlowAnimState.Starting:
-                        if (borderGlowFrame < startEndFrame)
-                        {
-                            borderGlowFrame++;
-                        } 
-                        else
-                        {
-                            glowState = GlowAnimState.Idle;
-                            borderGlowFrame = idleStartFrame;
-                        }
-                        break;
-                    case GlowAnimState.Idle:
-                        borderGlowFrame++;
-                        if (borderGlowFrame > idleEndFrame)
-                        {
-                            borderGlowFrame = idleStartFrame;
-                        }
-                        break;
-                    case GlowAnimState.Ending:
-                        if (borderGlowFrame < endEndFrame)
-                        {
-                            borderGlowFrame++;
-                        }
-                        else
-                        {
-                            glowState = GlowAnimState.None;
-                        }
-                        break;
-                }
-            }
-
-            //idle sound handling
-            if (glowState == GlowAnimState.Idle)
-            {
-                idleSoundTimer++;
-                if(idleSoundTimer >= 60)
-                {
-                    SoundEngine.PlaySound(new SoundStyle("ATLAMod/Assets/Sounds/SoundEffects/fireIdle")
-                    {
-                        Volume = 0.2f,
-                        PitchVariance = 0.2f
-                    });
-                    idleSoundTimer = 0;
-                }
-            }
-            else
-            {
-                idleSoundTimer = 0;
-            }
-    //handling passive regen glow ^^^ ----------------------------------------------------------
+            UpdatePassiveRegenGlow(player);
+            UpdateActiveBreathingGlow(player);
 
             base.Update(gameTime);
         }
 
-        //FILLBAR GLOW EFFECTS
+        //FILLBAR GLOW EFFECT
         private void UpdateGlowEffect(BendingPlayer player)
         {
             Color glowColor = Color.White;
@@ -235,7 +168,138 @@ namespace ATLAMod.UI.BreathMeter
 
             breathFill.Color = glowColor;
         }
-                
+
+        //PASSIVEREGENGLOW EFFECT - still need to smooth animation**
+        private void UpdatePassiveRegenGlow(BendingPlayer player)
+        {
+            if (player.breathRegenTimer >= 180 && player.breath < player.maxBreath)
+            {
+                if (glowState == GlowAnimState.None)
+                {
+                    glowState = GlowAnimState.Starting;
+                    borderGlowFrame = startStartFrame;
+
+                    //playing initial whoosh sound
+                    SoundEngine.PlaySound(new SoundStyle("ATLAMod/Assets/Sounds/SoundEffects/shoo-wung")
+                    {
+                        Volume = 0.1f,
+                        Pitch = 0.1f
+                    });
+                }
+            }
+            else
+            {
+                if (glowState != GlowAnimState.None && glowState != GlowAnimState.Ending)
+                {
+                    glowState = GlowAnimState.Ending;
+                    borderGlowFrame = endStartFrame;
+                }
+            }
+
+            borderGlowTimer++;
+            if (borderGlowTimer >= borderGlowSpeed)
+            {
+                borderGlowTimer = 0;
+
+                switch (glowState)
+                {
+                    case GlowAnimState.Starting:
+                        if (borderGlowFrame < startEndFrame)
+                        {
+                            borderGlowFrame++;
+                        }
+                        else
+                        {
+                            glowState = GlowAnimState.Idle;
+                            borderGlowFrame = idleStartFrame;
+                        }
+                        break;
+                    case GlowAnimState.Idle:
+                        borderGlowFrame++;
+                        if (borderGlowFrame > idleEndFrame)
+                        {
+                            borderGlowFrame = idleStartFrame;
+                        }
+                        break;
+                    case GlowAnimState.Ending:
+                        if (borderGlowFrame < endEndFrame)
+                        {
+                            borderGlowFrame++;
+                        }
+                        else
+                        {
+                            glowState = GlowAnimState.None;
+                        }
+                        break;
+                }
+            }
+        }
+
+        private void UpdateActiveBreathingGlow(BendingPlayer player)
+        {
+            if (player.isActivelyBreathing)
+            {
+                if (abGlowState == GlowAnimState.None)
+                {
+                    abGlowState = GlowAnimState.Starting;
+                    abGlowFrame = abStartStart;
+
+                    //playing initial whoosh sound
+                    SoundEngine.PlaySound(new SoundStyle("ATLAMod/Assets/Sounds/SoundEffects/igniteSmall1")
+                    {
+                        Volume = 0.1f,
+                        Pitch = 0.1f
+                    });
+                }
+            }
+            else
+            {
+                if (abGlowState != GlowAnimState.None && abGlowState != GlowAnimState.Ending)
+                {
+                    abGlowState = GlowAnimState.Ending;
+                    abGlowFrame = abEndStart;
+                }
+            }
+
+            abGlowTimer++;
+            if (abGlowTimer >= abGlowSpeed)
+            {
+                abGlowTimer = 0;
+
+                switch (abGlowState)
+                {
+                    case GlowAnimState.Starting:
+                        if (abGlowFrame < abStartEnd)
+                        {
+                            abGlowFrame++;
+                        }
+                        else
+                        {
+                            abGlowState = GlowAnimState.Idle;
+                            abGlowFrame = abIdleStart;
+                        }
+                        break;
+                    case GlowAnimState.Idle:
+                        abGlowFrame++;
+                        if (abGlowFrame > abIdleEnd)
+                        {
+                            abGlowFrame = abIdleStart;
+                        }
+                        break;
+                    case GlowAnimState.Ending:
+                        if (abGlowFrame < abEndEnd)
+                        {
+                            abGlowFrame++;
+                        }
+                        else
+                        {
+                            abGlowState = GlowAnimState.None;
+                        }
+                        break;
+                }
+            }
+        }
+
         public override void Draw(SpriteBatch spriteBatch)
         {
             if (!Visible)
@@ -246,15 +310,24 @@ namespace ATLAMod.UI.BreathMeter
 
 
             var player = Main.LocalPlayer.GetModPlayer<BendingPlayer>();            
-            var breathBorderGlow = ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/PassiveGlowFinal").Value;
+            var breathBorderGlow = ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/PassiveGlowNEW").Value;
+            var abBorderGlow = ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/activeBreathing").Value;
 
-            Vector2 position = new Vector2(UI_LEFT - 10, UI_TOP - 10);            
+            Vector2 position = new Vector2(UI_LEFT - 4, UI_TOP - 6);
+            Vector2 abPosition = new Vector2(UI_LEFT - 10, UI_TOP - 10);
 
             if (glowState != GlowAnimState.None)
             {                
                 int frameHeight = breathBorderGlow.Height / borderGlowFrameCount;                
-                Rectangle sourceRect = new Rectangle(0, borderGlowFrame * frameHeight, breathBorderGlow.Width, frameHeight - 2);
+                Rectangle sourceRect = new Rectangle(0, borderGlowFrame * frameHeight, breathBorderGlow.Width, frameHeight);
                 spriteBatch.Draw(breathBorderGlow, position, sourceRect, Color.White * 0.8f);
+            }
+
+            if (abGlowState != GlowAnimState.None)
+            {
+                int abFrameHeight = abBorderGlow.Height / abGlowFrameCount;
+                Rectangle ABsourceRect = new Rectangle(0, abGlowFrame * abFrameHeight, abBorderGlow.Width, abFrameHeight);
+                spriteBatch.Draw(abBorderGlow, abPosition, ABsourceRect, Color.White * 0.8f);
             }
 
         }

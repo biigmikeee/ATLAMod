@@ -26,6 +26,8 @@
 	  <None Remove="UI\BreathMeter\BreathMeterBack.png" />
 	  <None Remove="UI\BreathMeter\BreathMeterPassiveGlowAnimated.png" />
 	  <None Remove="UI\BreathMeter\PassiveGlow.png" />
+	  <None Remove="UI\BreathMeter\PassiveGlowFinal.png" />
+	  <None Remove="UI\BreathMeter\PassiveGlowNEW.png" />
 	  <None Remove="UI\BreathMeter\test2.png" />
 	</ItemGroup>
 
