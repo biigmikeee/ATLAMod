@@ -300,6 +300,8 @@ namespace ATLAMod.UI.BreathMeter
             }
         }
 
+
+
         public override void Draw(SpriteBatch spriteBatch)
         {
             if (!Visible)
