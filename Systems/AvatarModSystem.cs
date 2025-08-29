@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Security.Cryptography.X509Certificates;
 using ATLAMod.Systems.Players;
 using ATLAMod.UI.BreathMeter;
+using ATLAMod.UI.AttackHotbar;
 
 namespace ATLAMod.Systems
 {
@@ -27,6 +28,10 @@ namespace ATLAMod.Systems
         //BREATHMETER - FIREBENDER INTERFACES
         public BreathMeter breathMeter;
         private UserInterface breathMeterInterface;
+
+        //ATTACK HOTBAR
+        private UserInterface hotbarUIInterface;
+        private AttackHotbar hotbarUI;
 
 
         public static Texture2D WhitePixel;
@@ -51,6 +56,12 @@ namespace ATLAMod.Systems
                 breathMeterInterface = new UserInterface();
                 breathMeter.Activate();
                 breathMeterInterface.SetState(breathMeter);
+
+                //ATTACK HORBAR
+                hotbarUI = new AttackHotbar();
+                hotbarUI.Activate();
+                hotbarUIInterface = new UserInterface();
+                hotbarUIInterface.SetState(hotbarUI);
             }
         }
 
@@ -79,12 +90,14 @@ namespace ATLAMod.Systems
             {
                 breathMeter.Visible = false;
             }
+
+            hotbarUIInterface?.Update(gameTime);
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
             int mouseTextIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
-            int behindInventory = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Invasion Progress Bars"));
+            int behindInventory = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Invasion Progress Bars"));            
 
             if (mouseTextIndex != -1)
             {
@@ -126,6 +139,15 @@ namespace ATLAMod.Systems
                     },
                         InterfaceScaleType.UI));
                 }
+
+                //ATTACKHOTBAR
+                layers.Insert(mouseTextIndex, new LegacyGameInterfaceLayer(
+                    "ATLA: Moveset Hotbar",
+                    delegate
+                    {
+                        hotbarUIInterface?.Draw(Main.spriteBatch, new GameTime());
+                        return true;
+                    }, InterfaceScaleType.UI));
             }
         }
 
