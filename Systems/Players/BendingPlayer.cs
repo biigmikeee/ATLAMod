@@ -38,13 +38,10 @@ namespace ATLAMod.Systems.Players
         public bool isActivelyBreathing = false;
         public int activeBreathingDuration = 0;
 
-        public AttackHotbar attackHotbar;
         public override void Initialize()
         {
             hasChosenBending = false;
             breatheTimer = 60;
-
-            attackHotbar = null;
         }
 
         public override void SaveData(TagCompound tag)
@@ -56,12 +53,7 @@ namespace ATLAMod.Systems.Players
             tag["hasLearnedAir"] = hasLearnedAir;
 
             tag["breath"] = breath;
-            tag["maxBreath"] = maxBreath;
-
-            if (attackHotbar != null)
-            {
-                tag["attackHotbar"] = attackHotbar.Save();
-            }            
+            tag["maxBreath"] = maxBreath;  
         }
 
         public override void LoadData(TagCompound tag)
@@ -83,17 +75,10 @@ namespace ATLAMod.Systems.Players
             if (chosenStyle != BendingStyle.None)
             {
                 hasChosenBending = true;
-                InitializeHotbar();
-
-                if (tag.ContainsKey("attackHotbar"))
-                {
-                    attackHotbar.Load(tag.GetCompound("attackHotbar"));
-                }
             }
             else
             {
                 hasChosenBending = false;
-                attackHotbar = null;
             }
         }
 
