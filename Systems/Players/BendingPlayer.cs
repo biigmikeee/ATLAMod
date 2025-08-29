@@ -12,6 +12,7 @@ using ATLAMod.UI.BendingScroll;
 using System.Security.Cryptography.X509Certificates;
 using Terraria.GameInput;
 using ATLAMod.Buffs.FireBendingBuffs;
+using ATLAMod.Systems;
 
 namespace ATLAMod.Systems.Players
 {
@@ -38,10 +39,26 @@ namespace ATLAMod.Systems.Players
         public bool isActivelyBreathing = false;
         public int activeBreathingDuration = 0;
 
+        //ATTACKHOTBAR STUFF
+        public struct MoveSlot
+        {
+            public bool Unlocked;
+            public string MoveId;
+        }
+        public MoveSlot[] MoveSlots = new MoveSlot[6];
+        public int UnlockedSlots = 2;
+        public int SelectedSlotIndex = 0;
+        public bool HotbarExpanded = false;
+
+        private readonly Dictionary<string, int> _moveCooldown = new();
+
         public override void Initialize()
         {
             hasChosenBending = false;
             breatheTimer = 60;
+
+            //initializing slots once per player
+            for (int i = 0; i < MoveSlots.Length; i++) MoveSlots[i].Unlocked = i < UnlockedSlots;
         }
 
         public override void SaveData(TagCompound tag)
@@ -53,7 +70,22 @@ namespace ATLAMod.Systems.Players
             tag["hasLearnedAir"] = hasLearnedAir;
 
             tag["breath"] = breath;
-            tag["maxBreath"] = maxBreath;  
+            tag["maxBreath"] = maxBreath; 
+            
+            tag["UnlockedSlots"] = UnlockedSlots;
+            tag["SelectedSlotIndex"] = SelectedSlotIndex;
+            tag["HotbarExpanded"] = HotbarExpanded;
+
+            var slotIds = new string[6];
+            var slotUnlocks = new bool[6];
+            for (int i = 0; i < 6; i++)
+            {
+                slotIds[i] = MoveSlots[i].MoveId ?? "";
+                slotUnlocks[i] = MoveSlots[i].Unlocked;
+            }
+
+            tag["MoveSlotIds"] = slotIds;
+            tag["MoveSlotUnlocked"] = slotUnlocks;
         }
 
         public override void LoadData(TagCompound tag)
@@ -80,6 +112,19 @@ namespace ATLAMod.Systems.Players
             {
                 hasChosenBending = false;
             }
+
+            UnlockedSlots = tag.GetInt("UnlockedSlots");
+            SelectedSlotIndex = tag.GetInt("SelectedSlotIndex");
+            HotbarExpanded = tag.GetBool("HotbarExpanded");
+
+            var slotIds = tag.Get<string[]>("MoveSlotIds");
+            var slotUnlocks = tag.Get<bool[]>("MoveSlotUnlocked");
+            for (int i = 0; i < 6; i++)
+            {
+                MoveSlots[i].Unlocked = (i < UnlockedSlots) || (slotUnlocks != null && i < slotUnlocks.Length && slotUnlocks[i]);
+                MoveSlots[i].MoveId = (slotIds != null && i < slotIds.Length) ? slotIds[i] : "";
+            }
+
         }
 
         public override void PostUpdate()
@@ -230,6 +275,52 @@ namespace ATLAMod.Systems.Players
             return false;
         }
 
+        //HANDLING ATTACKHOTBAR STUFF
+        public override void ResetEffects()
+        {
+            var keys = new List<string>(_moveCooldown.Keys);
+            foreach (var k in keys)
+            {
+                _moveCooldown[k] = System.Math.Max(0, _moveCooldown[k] - 1);
+                if (_moveCooldown[k] == 0) _moveCooldown.Remove(k);
+            }
+        }
+
+        public bool IsMoveOnCooldown(string id) => _moveCooldown.ContainsKey(id);
+        public void SetMoveCooldown(string id, int ticks)
+        {
+            if (ticks <= 0) return;
+            _moveCooldown[id] = ticks;
+        }
+
+        public bool AssignMoveToSlot(int slot, string moveId)
+        {
+            if (slot < 0 || slot >= MoveSlots.Length) return false;
+            if (!MoveSlots[slot].Unlocked) return false;
+            MoveSlots[slot].MoveId = moveId;
+            return true;
+        }
+
+        public void SelectSlot(int slot)
+        {
+            if (slot >= 0 && slot  < MoveSlots.Length && MoveSlots[slot].Unlocked)
+            {
+                SelectedSlotIndex = slot;
+            }
+        }
+
+        public bool TryUseSelectedMove()
+        {
+            var slot = MoveSlots[SelectedSlotIndex];
+            if (string.IsNullOrEmpty(slot.MoveId)) return false;
+            var move = Bending.MoveRegistry.Get(slot.MoveId);
+            if (move == null) return false;
+            if (!move.CanUse(Player, this)) return false;
+
+            move.OnUse(Player, this);
+            return true;
+        }
+
         public override void ProcessTriggers(TriggersSet triggerSet)
         {
             if (!hasLearnedFire)
@@ -250,7 +341,34 @@ namespace ATLAMod.Systems.Players
                 {
                     Main.NewText("NOT ENOUH BREATH");
                 }
-            }                        
+            }
+            
+            if (ATLAMod.ToggleAttackHotbar.JustPressed)
+            {
+                HotbarExpanded = !HotbarExpanded;
+            }
+
+            if (HotbarExpanded)
+            {
+                if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D1)) SelectSlot(0);
+                if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D2)) SelectSlot(1);
+                if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D3)) SelectSlot(2);
+                if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D4)) SelectSlot(3);
+                if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D5)) SelectSlot(4);
+                if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D6)) SelectSlot(5);
+            }
+
+            //left click works only if the hotbar is expanded and the mouse isnt over any ui panels
+            if (HotbarExpanded && !Main.LocalPlayer.mouseInterface && Terraria.GameInput.PlayerInput.Triggers.JustPressed.MouseLeft)
+            {
+                if (TryUseSelectedMove())
+                {
+                    Player.controlUseItem = false;
+                    Player.releaseUseItem = true;
+                    Player.itemAnimation = 0;
+                    Player.itemTime = 0;
+                }
+            }
         }
     }
 }
