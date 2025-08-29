@@ -13,9 +13,12 @@ namespace ATLAMod.Projectiles
 {
     public class FireFistProj : ModProjectile
     {
+
+        public override string Texture => "Terraria/Images/Projectile_326";
         public override void SetStaticDefaults()
         {
-
+            ProjectileID.Sets.TrailCacheLength[Type] = 8;
+            ProjectileID.Sets.TrailingMode[Type] = 2;
         }
 
         public override void SetDefaults()

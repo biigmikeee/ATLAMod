@@ -40,4 +40,7 @@ Items: {
 Keybinds: {
 	"Use Breath TEST.DisplayName": Use  Breath  T E S T
 	Breathe.DisplayName: Breathe
+	"Toggle Moveset Hotbar.DisplayName": Toggle  Moveset  Hotbar
 }
+
+Projectiles.FireFistProj.DisplayName: Fire Fist Proj

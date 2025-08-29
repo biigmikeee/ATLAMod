@@ -56,14 +56,9 @@ namespace ATLAMod.UI.AttackHotbar
             root.Height.Set(120, 0f);
             Append(root);
 
-            // Load initial assets (default to Fire if we can't read player yet)
-            var style = BPStyle.Fire;
-            if (Main.LocalPlayer != null)
-            {
-                style = Main.LocalPlayer.GetModPlayer<BendingPlayer>().chosenStyle;
-            }
-            LoadAssetsForStyle(style);
-            _lastStyleLoaded = style;
+            // Load initial assets (default to Fire if we can't read player yet)            
+            LoadAssetsForStyle(BPStyle.Fire);
+            _lastStyleLoaded = BPStyle.Fire;
 
             // Create slot images
             for (int i = 0; i < MaxSlots; i++)
@@ -103,29 +98,33 @@ namespace ATLAMod.UI.AttackHotbar
         {
             base.Update(gameTime);
 
-            var bp = Main.LocalPlayer.GetModPlayer<BendingPlayer>();
-
-            // If the style changed (e.g., after choosing in the Bending Scroll), reload themed assets
-            if (bp.chosenStyle != _lastStyleLoaded)
+            var lp = Main.LocalPlayer;
+            if (lp != null && lp.active)
             {
-                LoadAssetsForStyle(bp.chosenStyle);
-                _lastStyleLoaded = bp.chosenStyle;
-            }
+                var bp = lp.GetModPlayer<BendingPlayer>();
 
-            // Capture mouse ONLY when hovering the hotbar area (so left-click outside can fire moves)
-            if (bp.HotbarExpanded)
-            {
-                var bg = texScrollOpen;
-                var area = GetBackgroundRect(bg);
-                if (area.Contains(Main.mouseX, Main.mouseY))
+                // If the style changed (e.g., after choosing in the Bending Scroll), reload themed assets
+                if (bp.chosenStyle != _lastStyleLoaded)
                 {
-                    Main.LocalPlayer.mouseInterface = true; // let slot clicks select, not fire
+                    LoadAssetsForStyle(bp.chosenStyle);
+                    _lastStyleLoaded = bp.chosenStyle;
                 }
-            }
-            else
-            {
-                // Collapsed: only show hint on hover; no need to capture clicks here
-                // (We keep mouseInterface false so normal gameplay continues)
+
+                // Capture mouse ONLY when hovering the hotbar area (so left-click outside can fire moves)
+                if (bp.HotbarExpanded)
+                {
+                    var bg = texScrollOpen;
+                    var area = GetBackgroundRect(bg);
+                    if (area.Contains(Main.mouseX, Main.mouseY))
+                    {
+                        Main.LocalPlayer.mouseInterface = true; // let slot clicks select, not fire
+                    }
+                }
+                else
+                {
+                    // Collapsed: only show hint on hover; no need to capture clicks here
+                    // (We keep mouseInterface false so normal gameplay continues)
+                }
             }
         }
 
@@ -133,7 +132,8 @@ namespace ATLAMod.UI.AttackHotbar
         {
             if (Main.gameMenu) return;
 
-            var bp = Main.LocalPlayer.GetModPlayer<BendingPlayer>();
+            var lp = Main.LocalPlayer;
+            var bp = lp?.GetModPlayer<BendingPlayer>();
             var pos = new Vector2(root.GetInnerDimensions().X, root.GetInnerDimensions().Y);
 
             // Draw background (collapsed vs expanded)
