@@ -47,7 +47,7 @@ namespace ATLAMod.Systems.Bending
         {
             if (Style == BendingStyle.Fire && Cost > 0)
             {
-                byte.TryConsumeBreath(Cost);
+                bp.TryConsumeBreath(Cost);
             }
             if (CooldownTicks > 0) bp.SetMoveCooldown(Id, CooldownTicks);
         }
