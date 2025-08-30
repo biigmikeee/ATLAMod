@@ -343,31 +343,46 @@ namespace ATLAMod.Systems.Players
                 }
             }
             
-            if (ATLAMod.ToggleAttackHotbar.JustPressed)
+            if (ATLAMod.ToggleAttackHotbar != null && ATLAMod.ToggleAttackHotbar.JustPressed)
             {
                 HotbarExpanded = !HotbarExpanded;
             }
 
-            if (HotbarExpanded)
+            if (!HotbarExpanded)
             {
-                if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D1)) SelectSlot(0);
-                if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D2)) SelectSlot(1);
-                if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D3)) SelectSlot(2);
-                if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D4)) SelectSlot(3);
-                if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D5)) SelectSlot(4);
-                if (Main.keyState.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.D6)) SelectSlot(5);
+                return;
             }
 
-            //left click works only if the hotbar is expanded and the mouse isnt over any ui panels
-            if (HotbarExpanded && !Main.LocalPlayer.mouseInterface && Terraria.GameInput.PlayerInput.Triggers.JustPressed.MouseLeft)
+            if (HotbarExpanded)
             {
-                if (TryUseSelectedMove())
-                {
-                    Player.controlUseItem = false;
-                    Player.releaseUseItem = true;
-                    Player.itemAnimation = 0;
-                    Player.itemTime = 0;
-                }
+                if (PlayerInput.Triggers.JustPressed.Hotbar1) { SelectSlot(0); PlayerInput.Triggers.Current.Hotbar1 = false; }
+                if (PlayerInput.Triggers.JustPressed.Hotbar2) { SelectSlot(1); PlayerInput.Triggers.Current.Hotbar2 = false; }
+                if (PlayerInput.Triggers.JustPressed.Hotbar3) { SelectSlot(2); PlayerInput.Triggers.Current.Hotbar3 = false; }
+                if (PlayerInput.Triggers.JustPressed.Hotbar4) { SelectSlot(3); PlayerInput.Triggers.Current.Hotbar4 = false; }
+                if (PlayerInput.Triggers.JustPressed.Hotbar5) { SelectSlot(4); PlayerInput.Triggers.Current.Hotbar5 = false; }
+                if (PlayerInput.Triggers.JustPressed.Hotbar6) { SelectSlot(5); PlayerInput.Triggers.Current.Hotbar6 = false; }
+            }
+
+            bool overUI = Main.LocalPlayer.mouseInterface;
+            if(!overUI && PlayerInput.Triggers.JustPressed.MouseLeft)
+            {
+                bool cast = TryUseSelectedMove();
+
+                PlayerInput.Triggers.Current.MouseLeft = false;
+                Player.controlUseItem = false;
+                Player.releaseUseItem = true;
+                Player.itemAnimation = 0;
+                Player.itemTime = 0;
+                Player.controlUseTile = false;
+                Player.controlThrow = false;
+            }
+
+            if (!overUI && PlayerInput.Triggers.Current.MouseLeft)
+            {
+                PlayerInput.Triggers.Current.MouseLeft = false;
+                Player.controlUseItem = false;
+                Player.controlUseTile = false;
+                Player.controlThrow = false;
             }
         }
     }
