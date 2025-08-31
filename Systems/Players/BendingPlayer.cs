@@ -13,6 +13,7 @@ using System.Security.Cryptography.X509Certificates;
 using Terraria.GameInput;
 using ATLAMod.Buffs.FireBendingBuffs;
 using ATLAMod.Systems;
+using ATLAMod.Systems.Bending;
 
 namespace ATLAMod.Systems.Players
 {
@@ -59,6 +60,12 @@ namespace ATLAMod.Systems.Players
 
             //initializing slots once per player
             for (int i = 0; i < MoveSlots.Length; i++) MoveSlots[i].Unlocked = i < UnlockedSlots;
+
+            // adding fireFist(testMove) to test with hotbar
+            if (MoveRegistry.Get("fire_fist") != null)
+            {
+                MoveSlots[0].MoveId = "fire_fist";
+            }
         }
 
         public override void SaveData(TagCompound tag)
@@ -312,12 +319,16 @@ namespace ATLAMod.Systems.Players
         public bool TryUseSelectedMove()
         {
             var slot = MoveSlots[SelectedSlotIndex];
-            if (string.IsNullOrEmpty(slot.MoveId)) return false;
+            if (string.IsNullOrEmpty(slot.MoveId)) { Main.NewText("[ATLA] No move in selected slot"); return false; }
+           
             var move = Bending.MoveRegistry.Get(slot.MoveId);
-            if (move == null) return false;
+            if (move == null) { Main.NewText($"[ATLA] Move not found: {slot.MoveId}"); return false; }
+
             if (!move.CanUse(Player, this)) return false;
 
             move.OnUse(Player, this);
+            Main.NewText($"[ATLA] Cast {move.Name}");
+
             return true;
         }
 
@@ -366,7 +377,7 @@ namespace ATLAMod.Systems.Players
             bool overUI = Main.LocalPlayer.mouseInterface;
             if(!overUI && PlayerInput.Triggers.JustPressed.MouseLeft)
             {
-                bool cast = TryUseSelectedMove();
+                bool cast = TryUseSelectedMove();                
 
                 PlayerInput.Triggers.Current.MouseLeft = false;
                 Player.controlUseItem = false;

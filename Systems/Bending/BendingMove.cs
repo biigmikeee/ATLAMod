@@ -36,8 +36,8 @@ namespace ATLAMod.Systems.Bending
 
         public virtual bool CanUse(Player p, BendingPlayer bp)
         {
-            if (!bp.chosenStyle.Equals(Style)) return false;
-            if (bp.IsMoveOnCooldown(Id)) return false;
+            if (!bp.chosenStyle.Equals(Style)) { Main.NewText("WRONG STYLE"); return false; }
+            if (bp.IsMoveOnCooldown(Id)) { Main.NewText("still on cooldown"); return false; }
 
             if (Style == BendingStyle.Fire) return bp.breath >= Cost;
             return true;
