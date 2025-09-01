@@ -145,8 +145,15 @@ namespace ATLAMod.Systems
                     "ATLA: Moveset Hotbar",
                     delegate
                     {
-                        hotbarUIInterface?.Draw(Main.spriteBatch, new GameTime());
+                        var lp = Main.LocalPlayer;
+                        var bp = lp?.GetModPlayer<BendingPlayer>();
+
+                        if (bp != null && bp.chosenStyle != BendingPlayer.BendingStyle.None)
+                        {
+                            hotbarUIInterface?.Draw(Main.spriteBatch, new GameTime());
+                        }
                         return true;
+
                     }, InterfaceScaleType.UI));
             }
         }

@@ -12,7 +12,6 @@ using Terraria.ModLoader;
 using Terraria.UI;
 using ATLAMod.Systems.Bending;
 using ATLAMod.Systems.Players;
-using BPStyle = ATLAMod.Systems.Players.BendingPlayer.BendingStyle;
 
 
 namespace ATLAMod.UI.AttackHotbar
@@ -23,13 +22,13 @@ namespace ATLAMod.UI.AttackHotbar
 
         // Layout config (tweak to taste)
         private const int MaxSlots = 6;
-        private const int SlotSize = 64;
-        private const int SlotSpacing = 72;
+        private const int SlotSize = 54;
+        private const int SlotSpacing = 60;
         private const int SlotsLeftOffset = 20;
-        private const int SlotsTopOffset = 20;
+        private const int SlotsTopOffset = 8;
 
         // Anchor (bottom-left-ish); you can move this anywhere
-        private Vector2 AnchoredPos => new Vector2(300, Main.screenHeight - 140);
+        private Vector2 AnchoredPos => new Vector2(660, 12);
 
         // Slot UI elements (for click + hover)
         private readonly UIImage[] slotImages = new UIImage[MaxSlots];
@@ -44,7 +43,7 @@ namespace ATLAMod.UI.AttackHotbar
         // Cache for per-move icons
         private readonly Dictionary<string, Asset<Texture2D>> _iconCache = new();
 
-        private BPStyle _lastStyleLoaded = BPStyle.None;
+        private BendingPlayer.BendingStyle _lastStyleLoaded = BendingPlayer.BendingStyle.None;
 
         public override void OnInitialize()
         {
@@ -57,8 +56,8 @@ namespace ATLAMod.UI.AttackHotbar
             Append(root);
 
             // Load initial assets (default to Fire if we can't read player yet)            
-            LoadAssetsForStyle(BPStyle.Fire);
-            _lastStyleLoaded = BPStyle.Fire;
+            LoadAssetsForStyle(BendingPlayer.BendingStyle.Fire);
+            _lastStyleLoaded = BendingPlayer.BendingStyle.Fire;
 
             // Create slot images
             for (int i = 0; i < MaxSlots; i++)
@@ -71,7 +70,7 @@ namespace ATLAMod.UI.AttackHotbar
 
                 int capture = i;
                 img.OnLeftClick += (_, __) => OnSlotClicked(capture);
-                img.OnMouseOver += (_, __) => OnSlotHover(capture);
+                
 
                 root.Append(img);
                 slotImages[i] = img;
@@ -81,27 +80,38 @@ namespace ATLAMod.UI.AttackHotbar
         /// <summary>
         /// Plug your actual asset paths here. You can branch on style to load themed scrolls.
         /// </summary>
-        private void LoadAssetsForStyle(BPStyle style)
+        private void LoadAssetsForStyle(BendingPlayer.BendingStyle style)
         {
             // Example base; change to your real paths. You can do a switch(style) for per-style atlases.
-            string basePath = "ATLAMod/Assets/UITextures/attackHotbarTest";
+            string basePath = "ATLAMod/Assets/UITextures/attackHotbarUI";
 
-            texScrollCollapsed = ModContent.Request<Texture2D>($"{basePath}/collapsedTest", AssetRequestMode.ImmediateLoad);
-            texScrollOpen = ModContent.Request<Texture2D>($"{basePath}/expandedTest{style}", AssetRequestMode.ImmediateLoad);
+            texScrollCollapsed = ModContent.Request<Texture2D>($"{basePath}/collapsedHotbar", AssetRequestMode.ImmediateLoad);
+            texScrollOpen = ModContent.Request<Texture2D>($"{basePath}/expandedHotbar{style}", AssetRequestMode.ImmediateLoad);
 
-            texSlotEmpty = ModContent.Request<Texture2D>($"{basePath}/slotEmptyTest", AssetRequestMode.ImmediateLoad);
-            texSlotLocked = ModContent.Request<Texture2D>($"{basePath}/slotLockedTest", AssetRequestMode.ImmediateLoad);
-            texSlotSelected = ModContent.Request<Texture2D>($"{basePath}/slotSelectedTest", AssetRequestMode.ImmediateLoad);
+            texSlotEmpty = ModContent.Request<Texture2D>($"{basePath}/slotEmpty", AssetRequestMode.ImmediateLoad);
+            texSlotLocked = ModContent.Request<Texture2D>($"{basePath}/slotLocked", AssetRequestMode.ImmediateLoad);
+            texSlotSelected = ModContent.Request<Texture2D>($"{basePath}/slotSelected", AssetRequestMode.ImmediateLoad);
         }
 
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
+            
 
             var lp = Main.LocalPlayer;
-            if (lp != null && lp.active)
+
+            if (lp == null || !lp.active) return;
+
+            var bp = lp.GetModPlayer<BendingPlayer>();
+
+            //if no chosen style dont draw
+            if (bp.chosenStyle == BendingPlayer.BendingStyle.None)
             {
-                var bp = lp.GetModPlayer<BendingPlayer>();
+                return;
+            }
+
+            if (lp != null && lp.active)
+            {                
 
                 // If the style changed (e.g., after choosing in the Bending Scroll), reload themed assets
                 if (bp.chosenStyle != _lastStyleLoaded)
@@ -135,6 +145,12 @@ namespace ATLAMod.UI.AttackHotbar
             var lp = Main.LocalPlayer;
             var bp = lp?.GetModPlayer<BendingPlayer>();
             var pos = new Vector2(root.GetInnerDimensions().X, root.GetInnerDimensions().Y);
+
+            //if no chosen style dont draw
+            if (bp == null || bp.chosenStyle == BendingPlayer.BendingStyle.None)
+            {
+                return;
+            }
 
             // Draw background (collapsed vs expanded)
             var bg = bp.HotbarExpanded ? texScrollOpen : texScrollCollapsed;
@@ -174,9 +190,10 @@ namespace ATLAMod.UI.AttackHotbar
                         var iconAsset = GetMoveIcon(move.IconPath);
                         DrawIconCentered(spriteBatch, iconAsset.Value, img.GetDimensions().ToRectangle());
                     }
-                }
+                }                
             }
 
+            OnSlotHover();
             base.Draw(spriteBatch);
         }
 
@@ -187,36 +204,47 @@ namespace ATLAMod.UI.AttackHotbar
             bp.SelectSlot(index);
         }
 
-        private void OnSlotHover(int index)
+        private void OnSlotHover()
         {
-            var bp = Main.LocalPlayer.GetModPlayer<BendingPlayer>();
-            var slot = bp.MoveSlots[index];
+            var lp = Main.LocalPlayer;
+            if (lp == null || !lp.active) return;
 
-            if (!slot.Unlocked)
-            {
-                Main.instance.MouseText("Locked — unlock more slots through progression.");
-                return;
-            }
+            var bp = lp.GetModPlayer<BendingPlayer>();
+            if (!bp.HotbarExpanded) return;
 
-            if (string.IsNullOrEmpty(slot.MoveId))
+            for (int i = 0; i < MaxSlots; i++)
             {
-                Main.instance.MouseText("Empty slot — assign a move using the Bending Scroll.");
-                return;
-            }
+                var el = slotImages[i];
+                if (!el.IsMouseHovering) continue;
 
-            var move = MoveRegistry.Get(slot.MoveId);
-            if (move != null)
-            {
-                string resourceWord = bp.chosenStyle switch
+                var slot = bp.MoveSlots[i];
+                if (!slot.Unlocked)
                 {
-                    BendingPlayer.BendingStyle.Fire => "Breath",
-                    BendingPlayer.BendingStyle.Water => "Water",
-                    BendingPlayer.BendingStyle.Earth => "Stamina",
-                    BendingPlayer.BendingStyle.Air => "Chi",
-                    _ => "Cost"
-                };
-                Main.instance.MouseText($"{move.Name} — {move.Cost} {resourceWord}");
-            }
+                    Main.instance.MouseText("Locked - unlock more slots through progression.");
+                    break;
+                }
+
+                if (string.IsNullOrEmpty(slot.MoveId))
+                {
+                    Main.instance.MouseText("Empty slot - assign in the Bending Scroll.");
+                    break;
+                }
+
+                var move = MoveRegistry.Get(slot.MoveId);
+                if (move != null)
+                {
+                    string resourceWord = bp.chosenStyle switch
+                    {
+                        BendingPlayer.BendingStyle.Fire => "breath",
+                        BendingPlayer.BendingStyle.Water => "water",
+                        BendingPlayer.BendingStyle.Earth => "stamina",
+                        BendingPlayer.BendingStyle.Air => "chi",
+                        _ => "Cost"
+                    };
+                    Main.instance.MouseText($"{move.Name} - Uses {move.Cost} {resourceWord}");
+                }
+                break;
+            }  
         }
 
         // --- helpers ---

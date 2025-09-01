@@ -354,6 +354,16 @@ namespace ATLAMod.Systems.Players
                 }
             }
             
+            if (chosenStyle == BendingPlayer.BendingStyle.None)
+            {
+                if (ATLAMod.ToggleAttackHotbar != null && ATLAMod.ToggleAttackHotbar.JustPressed)
+                {
+                    HotbarExpanded = false;
+                    Main.NewText("Choose a bending style using your Bending Scroll to access your Moveset.");
+                }
+                return;
+            }
+
             if (ATLAMod.ToggleAttackHotbar != null && ATLAMod.ToggleAttackHotbar.JustPressed)
             {
                 HotbarExpanded = !HotbarExpanded;

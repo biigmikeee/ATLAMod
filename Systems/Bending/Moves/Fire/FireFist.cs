@@ -17,7 +17,7 @@ namespace ATLAMod.Systems.Bending.Moves.Fire
         public FireFist() : base(
             id: "fire_fist",
             name: "Fire Fist",
-            style: BendingStyle.Fire,
+            style: BendingPlayer.BendingStyle.Fire,
             iconPath: "ATLAMod/Assets/UITextures/attackHotbarTest/firefistIconTest",
             cost: 10,
             cdTicks: 30)

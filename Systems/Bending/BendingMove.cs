@@ -12,19 +12,18 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace ATLAMod.Systems.Bending
-{
-    public enum BendingStyle { None, Fire, Water, Earth, Air }
+{    
 
     public abstract class BendingMove
     {
         public string Id { get; }
         public string Name { get; }
-        public BendingStyle Style { get; }
+        public BendingPlayer.BendingStyle Style { get; }
         public string IconPath { get; }
         public int Cost;
         public int CooldownTicks;
 
-        protected BendingMove(string id, string name, BendingStyle style, string iconPath, int cost, int cdTicks)
+        protected BendingMove(string id, string name, BendingPlayer.BendingStyle style, string iconPath, int cost, int cdTicks)
         {
             Id = id;
             Name = name;
@@ -39,13 +38,13 @@ namespace ATLAMod.Systems.Bending
             if (!bp.chosenStyle.Equals(Style)) { Main.NewText("WRONG STYLE"); return false; }
             if (bp.IsMoveOnCooldown(Id)) { Main.NewText("still on cooldown"); return false; }
 
-            if (Style == BendingStyle.Fire) return bp.breath >= Cost;
+            if (Style == BendingPlayer.BendingStyle.Fire) return bp.breath >= Cost;
             return true;
         }
 
         public virtual void OnUse(Player p, BendingPlayer bp)
         {
-            if (Style == BendingStyle.Fire && Cost > 0)
+            if (Style == BendingPlayer.BendingStyle.Fire && Cost > 0)
             {
                 bp.TryConsumeBreath(Cost);
             }
