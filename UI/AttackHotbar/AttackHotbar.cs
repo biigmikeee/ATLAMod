@@ -40,6 +40,10 @@ namespace ATLAMod.UI.AttackHotbar
         private Asset<Texture2D> texSlotLocked;
         private Asset<Texture2D> texSlotSelected;
 
+        //possible slot misalign fix
+        private Point _lastScreen;
+        private float _lastUiScale;
+
         // Cache for per-move icons
         private readonly Dictionary<string, Asset<Texture2D>> _iconCache = new();
 
@@ -63,9 +67,7 @@ namespace ATLAMod.UI.AttackHotbar
             // Create slot images
             for (int i = 0; i < MaxSlots; i++)
             {                
-                var img = new UIImage(texSlotEmpty);
-                img.Left.Set(SlotsLeftOffset, 0f);
-                img.Top.Set(SlotsTopOffset, 0f);
+                var img = new UIImage(texSlotEmpty);                
                 img.Width.Set(SlotSize, 0f);
                 img.Height.Set(SlotSize, 0f);
 
@@ -77,6 +79,14 @@ namespace ATLAMod.UI.AttackHotbar
                 slotImages[i] = img;
             }
             ReflowSlots();
+
+            var currScreen = new Point(Main.screenWidth, Main.screenHeight);
+            if (currScreen != _lastScreen || Main.UIScale != _lastUiScale)
+            {
+                _lastScreen = currScreen;
+                _lastUiScale = Main.UIScale;
+                ReflowSlots();
+            }            
         }
 
         //realigning slots after drawing
@@ -92,7 +102,10 @@ namespace ATLAMod.UI.AttackHotbar
                 img.Top.Set(y, 0f);
                 img.Width.Set(SlotSize, 0f);
                 img.Height.Set(SlotSize, 0f);
-                img.Recalculate();
+                img.SetPadding(0);
+                img.HAlign = 0f;
+                img.VAlign = 0f;
+                img.Recalculate();                
             }
         }
 
