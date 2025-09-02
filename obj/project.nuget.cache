@@ -1,10 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "b3ZFv5FpNOu3Z+sUAodTWF9KobYniuv2grv4+uq8fDFpXVmMAYYRdmzfGIsZcNXlox3t0v7TXEZe76exubBGhw==",
+  "dgSpecHash": "auhNVWjJYaA8ug4jXPJ+ZdFLS/QYX1C17iOpeE1hBW/JIu1rd4m+wjSL05OzF1N+TVCQw4hWqrI4Nrf8u136+g==",
   "success": true,
   "projectFilePath": "C:\\Users\\micha\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\ATLAMod\\ATLAMod.csproj",
-  "expectedPackageFiles": [
-    "C:\\Users\\micha\\.nuget\\packages\\tmodloader.codeassist\\0.1.5\\tmodloader.codeassist.0.1.5.nupkg.sha512"
-  ],
+  "expectedPackageFiles": [],
   "logs": []
 }

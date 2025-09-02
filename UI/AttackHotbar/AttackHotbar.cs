@@ -25,7 +25,7 @@ namespace ATLAMod.UI.AttackHotbar
         private const int SlotSize = 54;
         private const int SlotSpacing = 60;
         private const int SlotsLeftOffset = 20;
-        private const int SlotsTopOffset = 8;
+        private const int SlotsTopOffset = 2;
 
         // Anchor (bottom-left-ish); you can move this anywhere
         private Vector2 AnchoredPos => new Vector2(660, 12);
@@ -47,6 +47,7 @@ namespace ATLAMod.UI.AttackHotbar
 
         public override void OnInitialize()
         {
+
             root = new UIElement();
             root.Left.Set(AnchoredPos.X, 0f);
             root.Top.Set(AnchoredPos.Y, 0f);
@@ -61,9 +62,9 @@ namespace ATLAMod.UI.AttackHotbar
 
             // Create slot images
             for (int i = 0; i < MaxSlots; i++)
-            {
+            {                
                 var img = new UIImage(texSlotEmpty);
-                img.Left.Set(SlotsLeftOffset + i * SlotSpacing, 0f);
+                img.Left.Set(SlotsLeftOffset, 0f);
                 img.Top.Set(SlotsTopOffset, 0f);
                 img.Width.Set(SlotSize, 0f);
                 img.Height.Set(SlotSize, 0f);
@@ -74,6 +75,24 @@ namespace ATLAMod.UI.AttackHotbar
 
                 root.Append(img);
                 slotImages[i] = img;
+            }
+            ReflowSlots();
+        }
+
+        //realigning slots after drawing
+        private void ReflowSlots()
+        {
+            for (int i = 0; i < slotImages.Length; i++)
+            {
+                int x = SlotsLeftOffset + i * SlotSpacing;
+                int y = SlotsTopOffset + ((i % 2 == 1) ? 2 : 0); //odd slots get shifted down to align w/ hotbar background
+
+                var img = slotImages[i];
+                img.Left.Set(x, 0f);
+                img.Top.Set(y, 0f);
+                img.Width.Set(SlotSize, 0f);
+                img.Height.Set(SlotSize, 0f);
+                img.Recalculate();
             }
         }
 
