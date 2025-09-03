@@ -75,7 +75,7 @@ namespace ATLAMod.UI.BendingScroll
             button.Height.Set(150, 0f);
             button.SetVisibility(1f, 1f);            
 
-            var glowTexture = ModContent.Request<Texture2D>($"ATLAMod/Assets/UITextures/bendingChooseUI/bendingChooseUIbuttonGlow{styleName}", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
+            var glowTexture = ModContent.Request<Texture2D>($"ATLAMod/Assets/UITextures/bendingChooseUI/{styleName}GlowButton", ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
             var glowImage = new glowButton(glowTexture);
             glowImage.Width.Set(glowTexture.Width, 0f);
             glowImage.Height.Set(glowTexture.Height, 0f);

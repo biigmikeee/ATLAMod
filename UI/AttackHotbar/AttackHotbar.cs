@@ -20,18 +20,17 @@ namespace ATLAMod.UI.AttackHotbar
     {
         private UIElement root;
 
-        // Layout config (tweak to taste)
+        // Layout config
         private const int MaxSlots = 6;
         private const int SlotSize = 54;
         private const int SlotSpacing = 60;
-        private const int SlotsLeftOffset = 20;
-        private const int SlotsTopOffset = 2;
-
-        // Anchor (bottom-left-ish); you can move this anywhere
+        private const int SlotsLeftOffset = 22;
+        private const int SlotsTopOffset = 4;
+      
         private Vector2 AnchoredPos => new Vector2(660, 12);
 
         // Slot UI elements (for click + hover)
-        private readonly UIImage[] slotImages = new UIImage[MaxSlots];
+        private readonly UIElement[] slotImages = new UIElement[MaxSlots];
 
         // UI textures (loaded as Assets)
         private Asset<Texture2D> texScrollCollapsed;
@@ -51,9 +50,9 @@ namespace ATLAMod.UI.AttackHotbar
         //yet ANOTHER possible fix - pixel snappers XD
         private static int Px(float v) => (int)System.MathF.Round(v);
 
-        private Rectangle SnappedSlotRect(UIImage img, int w, int h)
+        private Rectangle SnappedSlotRect(UIElement el, int w, int h)
         {
-            var d = img.GetDimensions();
+            var d = el.GetDimensions();
             return new Rectangle(Px(d.X), Px(d.Y), w, h);
         }
 
@@ -80,27 +79,24 @@ namespace ATLAMod.UI.AttackHotbar
             // Create slot images
             for (int i = 0; i < MaxSlots; i++)
             {                
-                var img = new UIImage(texSlotEmpty);                
-                img.Width.Set(SlotSize, 0f);
-                img.Height.Set(SlotSize, 0f);
-
+                var el = new UIElement();                
+                el.Width.Set(SlotSize, 0f);
+                el.Height.Set(SlotSize, 0f);
+                el.SetPadding(0); el.HAlign = 0f; el.VAlign = 0f;
                 int capture = i;
-                img.OnLeftClick += (_, __) => OnSlotClicked(capture);
-                
-
-                root.Append(img);
-                slotImages[i] = img;
+                el.OnLeftClick += (_, __) => OnSlotClicked(capture);
+                root.Append(el);
+                slotImages[i] = el;                
             }
-            ReflowSlots();            
+            ReflowSlots();
         }
 
-        //realigning slots after drawing
         private void ReflowSlots()
-        {
-            for (int i = 0; i < slotImages.Length; i++)
-            {
-                int x = SlotsLeftOffset + i * SlotSpacing;
-                int y = SlotsTopOffset + ((i % 2 == 1) ? 2 : 0); //odd slots get shifted down to align w/ hotbar background
+        {            
+            for (int i = 0; i < slotImages.Length; i++){
+                int spacing = i * SlotSpacing;
+                int x = SlotsLeftOffset + (spacing - (i * 2));
+                int y = SlotsTopOffset + ((i % 2 == 1) ? 2 : 0);
 
                 var img = slotImages[i];
                 img.Left.Set(x, 0f);
@@ -110,16 +106,14 @@ namespace ATLAMod.UI.AttackHotbar
                 img.SetPadding(0);
                 img.HAlign = 0f;
                 img.VAlign = 0f;
-                img.Recalculate();                
+                img.Recalculate();
+
             }
         }
 
-        /// <summary>
-        /// Plug your actual asset paths here. You can branch on style to load themed scrolls.
-        /// </summary>
         private void LoadAssetsForStyle(BendingPlayer.BendingStyle style)
         {
-            // Example base; change to your real paths. You can do a switch(style) for per-style atlases.
+            
             string basePath = "ATLAMod/Assets/UITextures/attackHotbarUI";
 
             texScrollCollapsed = ModContent.Request<Texture2D>($"{basePath}/collapsedHotbar", AssetRequestMode.ImmediateLoad);
@@ -130,7 +124,7 @@ namespace ATLAMod.UI.AttackHotbar
             texSlotLocked = ModContent.Request<Texture2D>($"{basePath}/slotLocked", AssetRequestMode.ImmediateLoad);
             texSlotLockedHover = ModContent.Request<Texture2D>($"{basePath}/slotLockedHover", AssetRequestMode.ImmediateLoad);
             texSlotSelected = ModContent.Request<Texture2D>($"{basePath}/slotSelected", AssetRequestMode.ImmediateLoad);
-            texSlotHover = ModContent.Request<Texture2D>($"{basePath}/slotHover", AssetRequestMode.ImmediateLoad);
+            texSlotHover = ModContent.Request<Texture2D>($"{basePath}/slotDarken", AssetRequestMode.ImmediateLoad);
         }
 
         public override void Update(GameTime gameTime)
