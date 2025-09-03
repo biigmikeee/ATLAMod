@@ -61,8 +61,11 @@ namespace ATLAMod.UI.BreathMeter
         private const float UI_WIDTH = 144f;
         private const float UI_HEIGHT = 46f;
 
-        //not sure what this does
+        //not sure what this does i dont remember
         private float glowTimer = 0f;
+
+        // shaking effect for not enough breath - cooldown handling
+        private int _prevShakeTicks = 0;
 
         public override void OnInitialize()
         {
@@ -128,6 +131,9 @@ namespace ATLAMod.UI.BreathMeter
             UpdateGlowEffect(player);
             UpdatePassiveRegenGlow(player);
             UpdateActiveBreathingGlow(player);
+
+            //handling failbreathanimation
+            FailShake(player);
 
             base.Update(gameTime);
         }
@@ -300,7 +306,37 @@ namespace ATLAMod.UI.BreathMeter
             }
         }
 
+        public void FailShake(BendingPlayer player)
+        {
+            int shake = player.breathShakeTicks;
+            Vector2 shakeOffset = Vector2.Zero;
 
+            if (shake > 0)
+            {
+                float amp = 2.5f * (shake / 12f);
+                shakeOffset = new Vector2(Main.rand.NextFloat(-amp, amp), 0f);
+
+                if (_prevShakeTicks <= 0 && shake > 0)
+                {
+                    Main.NewText("Not enough breath.");
+                    SoundEngine.PlaySound(Terraria.ID.SoundID.Item108 with { Volume = 0.6f, Pitch = 1f });
+                }
+            }
+            _prevShakeTicks = shake;
+
+            breathBack.Left.Set(UI_LEFT + shakeOffset.X, 0f);
+            breathBack.Top.Set(UI_TOP + 2, 0f);
+            breathBack.Recalculate();
+
+            breathFillContainer.Left.Set(UI_LEFT + shakeOffset.X, 0f);            
+            breathFillContainer.Top.Set(UI_TOP, 0f);
+            breathFillContainer.Recalculate();
+
+            breathBorder.Left.Set(UI_LEFT + shakeOffset.X, 0f);
+            breathBorder.Top.Set(UI_TOP, 0f);
+            breathBorder.Recalculate();
+
+        }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
@@ -332,6 +368,13 @@ namespace ATLAMod.UI.BreathMeter
                 spriteBatch.Draw(abBorderGlow, abPosition, ABsourceRect, Color.White * 0.8f);
             }
 
+            var bp = Main.LocalPlayer.GetModPlayer<BendingPlayer>();           
+            var rect = breathBorder.GetDimensions().ToRectangle();
+            if (rect.Contains(Main.mouseX, Main.mouseY))
+            {
+                int currentBreath = (int)System.MathF.Round(bp.breath);
+                Main.instance.MouseText($"Breath - {currentBreath}/{bp.maxBreath}");
+            }
         }
     }
 }

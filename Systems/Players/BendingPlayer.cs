@@ -39,6 +39,9 @@ namespace ATLAMod.Systems.Players
         public int breatheCooldownTimer = 0;
         public bool isActivelyBreathing = false;
         public int activeBreathingDuration = 0;
+        public int breathShakeTicks = 0;
+        public int breathFailSoundCooldown = 0;
+
 
         //ATTACKHOTBAR STUFF
         public struct MoveSlot
@@ -279,6 +282,9 @@ namespace ATLAMod.Systems.Players
                 ConsumeBreath(amount);
                 return true;
             }
+
+            if (breathShakeTicks == 0) breathShakeTicks = 12;
+            if (breathFailSoundCooldown == 0) breathFailSoundCooldown = 12;
             return false;
         }
 
@@ -291,6 +297,9 @@ namespace ATLAMod.Systems.Players
                 _moveCooldown[k] = System.Math.Max(0, _moveCooldown[k] - 1);
                 if (_moveCooldown[k] == 0) _moveCooldown.Remove(k);
             }
+
+            if (breathShakeTicks > 0) breathShakeTicks--;
+            if (breathFailSoundCooldown > 0) breathFailSoundCooldown--;
         }
 
         public bool IsMoveOnCooldown(string id) => _moveCooldown.ContainsKey(id);
