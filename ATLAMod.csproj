@@ -8,6 +8,29 @@
 		
 	</PropertyGroup>
 	<ItemGroup>
+	  <None Remove="Assets\UITextures\attackHotbarTest\collapsedTest.png" />
+	  <None Remove="Assets\UITextures\attackHotbarTest\expandedTestAir.png" />
+	  <None Remove="Assets\UITextures\attackHotbarTest\expandedTestEarth.png" />
+	  <None Remove="Assets\UITextures\attackHotbarTest\expandedTestFire.png" />
+	  <None Remove="Assets\UITextures\attackHotbarTest\expandedTestNone.png" />
+	  <None Remove="Assets\UITextures\attackHotbarTest\expandedTestWater.png" />
+	  <None Remove="Assets\UITextures\attackHotbarTest\firefistIconTest.png" />
+	  <None Remove="Assets\UITextures\attackHotbarTest\slotEmptyTest.png" />
+	  <None Remove="Assets\UITextures\attackHotbarTest\slotLockedTest.png" />
+	  <None Remove="Assets\UITextures\attackHotbarTest\slotSelectedTest.png" />
+	  <None Remove="Assets\UITextures\attackHotbarUI\collapsedHotbar.png" />
+	  <None Remove="Assets\UITextures\attackHotbarUI\expandedHotbarAir.png" />
+	  <None Remove="Assets\UITextures\attackHotbarUI\expandedHotbarEarth.png" />
+	  <None Remove="Assets\UITextures\attackHotbarUI\expandedHotbarFire.png" />
+	  <None Remove="Assets\UITextures\attackHotbarUI\expandedHotbarNone.png" />
+	  <None Remove="Assets\UITextures\attackHotbarUI\expandedHotbarWater.png" />
+	  <None Remove="Assets\UITextures\attackHotbarUI\slotDarken.png" />
+	  <None Remove="Assets\UITextures\attackHotbarUI\slotEmpty.png" />
+	  <None Remove="Assets\UITextures\attackHotbarUI\slotEmptyHover.png" />
+	  <None Remove="Assets\UITextures\attackHotbarUI\slotHover.png" />
+	  <None Remove="Assets\UITextures\attackHotbarUI\slotLocked.png" />
+	  <None Remove="Assets\UITextures\attackHotbarUI\slotLockedHover.png" />
+	  <None Remove="Assets\UITextures\attackHotbarUI\slotSelected.png" />
 	  <None Remove="Assets\UITextures\bendingChooseUI\bendingChooseUIbackground.png" />
 	  <None Remove="Assets\UITextures\bendingChooseUI\bendingChooseUIbuttonAir.png" />
 	  <None Remove="Assets\UITextures\bendingChooseUI\bendingChooseUIbuttonEarth.png" />
@@ -24,11 +47,7 @@
 	  <None Remove="Buffs\FireBendingBuffs\BreathExhaustion.png" />						  	  <None Remove="Items\BendingScroll.png" />
 	  <None Remove="UI\BreathMeter\BreathFillGlowTEST.png" />
 	  <None Remove="UI\BreathMeter\BreathMeterBack.png" />
-	  <None Remove="UI\BreathMeter\BreathMeterPassiveGlowAnimated.png" />
-	  <None Remove="UI\BreathMeter\PassiveGlow.png" />
-	  <None Remove="UI\BreathMeter\PassiveGlowFinal.png" />
 	  <None Remove="UI\BreathMeter\PassiveGlowNEW.png" />
-	  <None Remove="UI\BreathMeter\test2.png" />
 	</ItemGroup>
 
 	<!-- References -->

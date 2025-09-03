@@ -37,17 +37,30 @@ namespace ATLAMod.UI.AttackHotbar
         private Asset<Texture2D> texScrollCollapsed;
         private Asset<Texture2D> texScrollOpen;
         private Asset<Texture2D> texSlotEmpty;
+        private Asset<Texture2D> texSlotEmptyHover;
         private Asset<Texture2D> texSlotLocked;
+        private Asset<Texture2D> texSlotLockedHover;
         private Asset<Texture2D> texSlotSelected;
-
-        //possible slot misalign fix
-        private Point _lastScreen;
-        private float _lastUiScale;
+        private Asset<Texture2D> texSlotHover;
 
         // Cache for per-move icons
         private readonly Dictionary<string, Asset<Texture2D>> _iconCache = new();
 
         private BendingPlayer.BendingStyle _lastStyleLoaded = BendingPlayer.BendingStyle.None;
+
+        //yet ANOTHER possible fix - pixel snappers XD
+        private static int Px(float v) => (int)System.MathF.Round(v);
+
+        private Rectangle SnappedSlotRect(UIImage img, int w, int h)
+        {
+            var d = img.GetDimensions();
+            return new Rectangle(Px(d.X), Px(d.Y), w, h);
+        }
+
+        private void DrawTex(SpriteBatch sb, Asset<Texture2D> tex, Rectangle r)
+        {
+            if (tex?.Value != null) sb.Draw(tex.Value, r, Color.White);
+        }
 
         public override void OnInitialize()
         {
@@ -78,15 +91,7 @@ namespace ATLAMod.UI.AttackHotbar
                 root.Append(img);
                 slotImages[i] = img;
             }
-            ReflowSlots();
-
-            var currScreen = new Point(Main.screenWidth, Main.screenHeight);
-            if (currScreen != _lastScreen || Main.UIScale != _lastUiScale)
-            {
-                _lastScreen = currScreen;
-                _lastUiScale = Main.UIScale;
-                ReflowSlots();
-            }            
+            ReflowSlots();            
         }
 
         //realigning slots after drawing
@@ -121,8 +126,11 @@ namespace ATLAMod.UI.AttackHotbar
             texScrollOpen = ModContent.Request<Texture2D>($"{basePath}/expandedHotbar{style}", AssetRequestMode.ImmediateLoad);
 
             texSlotEmpty = ModContent.Request<Texture2D>($"{basePath}/slotEmpty", AssetRequestMode.ImmediateLoad);
+            texSlotEmptyHover = ModContent.Request<Texture2D>($"{basePath}/slotEmptyHover", AssetRequestMode.ImmediateLoad);
             texSlotLocked = ModContent.Request<Texture2D>($"{basePath}/slotLocked", AssetRequestMode.ImmediateLoad);
+            texSlotLockedHover = ModContent.Request<Texture2D>($"{basePath}/slotLockedHover", AssetRequestMode.ImmediateLoad);
             texSlotSelected = ModContent.Request<Texture2D>($"{basePath}/slotSelected", AssetRequestMode.ImmediateLoad);
+            texSlotHover = ModContent.Request<Texture2D>($"{basePath}/slotHover", AssetRequestMode.ImmediateLoad);
         }
 
         public override void Update(GameTime gameTime)
@@ -202,27 +210,52 @@ namespace ATLAMod.UI.AttackHotbar
             // Expanded — draw slots and icons
             for (int i = 0; i < MaxSlots; i++)
             {
-                var slotState = bp.MoveSlots[i];
+                var slot = bp.MoveSlots[i];
                 var img = slotImages[i];
+                bool isHover = img.IsMouseHovering;
+                bool isSelected = (i == bp.SelectedSlotIndex);
 
-                // Pick slot frame
-                Asset<Texture2D> frame;
-                if (!slotState.Unlocked) frame = texSlotLocked;
-                else if (i == bp.SelectedSlotIndex) frame = texSlotSelected;
-                else frame = texSlotEmpty;
+                Rectangle slotRect = SnappedSlotRect(img, SlotSize, SlotSize);
 
-                img.SetImage(frame);
-
-                // Draw move icon if assigned
-                if (slotState.Unlocked && !string.IsNullOrEmpty(slotState.MoveId))
+                if (!slot.Unlocked) //locked slot
                 {
-                    var move = MoveRegistry.Get(slotState.MoveId);
+                    DrawTex(spriteBatch, isHover ? texSlotLockedHover : texSlotLocked, slotRect);
+                } else if (string.IsNullOrEmpty(slot.MoveId) && slot.Unlocked) // emptyslot
+                {
+                    bool useHoverIcon = isHover || isSelected;
+                    DrawTex(spriteBatch, useHoverIcon ? texSlotEmptyHover : texSlotEmpty, slotRect);
+                }
+                else //attack filled slot
+                {
+                    var move = MoveRegistry.Get(slot.MoveId);
                     if (move != null)
                     {
-                        var iconAsset = GetMoveIcon(move.IconPath);
-                        DrawIconCentered(spriteBatch, iconAsset.Value, img.GetDimensions().ToRectangle());
+                        var icon = GetMoveIcon(move.IconPath).Value;
+                        if (icon != null)
+                        {
+                            //centering icon
+                            float sx = SlotSize / (float)icon.Width;
+                            float sy = SlotSize / (float)icon.Height;
+                            float scale = System.MathF.Min(sx, sy);
+                            var size = new Vector2(icon.Width, icon.Height) * scale;
+
+                            int ix = Px(slotRect.X + (slotRect.Width - size.X) * 0.5f);
+                            int iy = Px(slotRect.Y + (slotRect.Height - size.Y) * 0.5f);
+                            var iconRect = new Rectangle(ix, iy, Px(size.X), Px(size.Y));
+                            spriteBatch.Draw(icon, iconRect, Color.White);
+                        }
                     }
-                }                
+                }
+
+                if (isHover) //hover border
+                {
+                    DrawTex(spriteBatch, texSlotHover, slotRect);
+                }
+                 
+                if (isSelected) //selectedslot
+                {
+                    DrawTex(spriteBatch, texSlotSelected, slotRect);
+                }
             }
 
             OnSlotHover();
