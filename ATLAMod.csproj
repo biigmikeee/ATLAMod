@@ -28,23 +28,26 @@
 	  <None Remove="Assets\UITextures\attackHotbarUI\slotEmpty.png" />
 	  <None Remove="Assets\UITextures\attackHotbarUI\slotEmptyHover.png" />
 	  <None Remove="Assets\UITextures\attackHotbarUI\slotHover.png" />
+	  <None Remove="Assets\UITextures\attackHotbarUI\slotHoverDark.png" />
 	  <None Remove="Assets\UITextures\attackHotbarUI\slotLocked.png" />
 	  <None Remove="Assets\UITextures\attackHotbarUI\slotLockedHover.png" />
 	  <None Remove="Assets\UITextures\attackHotbarUI\slotSelected.png" />
+	  <None Remove="Assets\UITextures\bendingChooseUI\airGlowButton.png" />
 	  <None Remove="Assets\UITextures\bendingChooseUI\bendingChooseUIbackground.png" />
 	  <None Remove="Assets\UITextures\bendingChooseUI\bendingChooseUIbuttonAir.png" />
 	  <None Remove="Assets\UITextures\bendingChooseUI\bendingChooseUIbuttonEarth.png" />
 	  <None Remove="Assets\UITextures\bendingChooseUI\bendingChooseUIbuttonFire.png" />
-	  <None Remove="Assets\UITextures\bendingChooseUI\bendingChooseUIbuttonGlowEarth.png" />
-	  <None Remove="Assets\UITextures\bendingChooseUI\bendingChooseUIbuttonGlowFire.png" />
-	  <None Remove="Assets\UITextures\bendingChooseUI\bendingChooseUIbuttonGlowWater.png" />
 	  <None Remove="Assets\UITextures\bendingChooseUI\bendingChooseUIbuttonWater.png" />
+	  <None Remove="Assets\UITextures\bendingChooseUI\earthGlowButton.png" />
+	  <None Remove="Assets\UITextures\bendingChooseUI\fireGlowButton.png" />
+	  <None Remove="Assets\UITextures\bendingChooseUI\waterGlowButton.png" />
 	  <None Remove="Assets\UITextures\whitePixel.png" />
 	  <None Remove="Buffs\BendingStyles\airbenderBuff.png" />
 	  <None Remove="Buffs\BendingStyles\earthbenderBuff.png" />
 	  <None Remove="Buffs\BendingStyles\firebenderBuff.png" />
 	  <None Remove="Buffs\BendingStyles\waterbenderBuff.png" />
-	  <None Remove="Buffs\FireBendingBuffs\BreathExhaustion.png" />						  	  <None Remove="Items\BendingScroll.png" />
+	  <None Remove="Buffs\FireBendingBuffs\BreathExhaustion.png" />
+	  <None Remove="Dusts\Fire\emberDustTest.png" />						  	  <None Remove="Items\BendingScroll.png" />						  	  <None Remove="Projectiles\fireFistProjTest.png" />
 	  <None Remove="UI\BreathMeter\BreathFillGlowTEST.png" />
 	  <None Remove="UI\BreathMeter\BreathMeterBack.png" />
 	  <None Remove="UI\BreathMeter\PassiveGlowNEW.png" />

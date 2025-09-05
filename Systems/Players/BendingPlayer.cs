@@ -14,6 +14,7 @@ using Terraria.GameInput;
 using ATLAMod.Buffs.FireBendingBuffs;
 using ATLAMod.Systems;
 using ATLAMod.Systems.Bending;
+using Terraria.Audio;
 
 namespace ATLAMod.Systems.Players
 {
@@ -284,7 +285,11 @@ namespace ATLAMod.Systems.Players
             }
 
             if (breathShakeTicks == 0) breathShakeTicks = 12;
-            if (breathFailSoundCooldown == 0) breathFailSoundCooldown = 12;
+            if (breathFailSoundCooldown == 0)
+            {
+                breathFailSoundCooldown = 12;
+                SoundEngine.PlaySound(Terraria.ID.SoundID.Item42 with { Volume = 0.6f, Pitch = -0.5f });
+            }
             return false;
         }
 

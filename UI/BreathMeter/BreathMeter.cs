@@ -11,6 +11,7 @@ using Terraria.ModLoader;
 using ATLAMod.Systems.Players;
 using Microsoft.Xna.Framework;
 using Terraria.Audio;
+using System.Security.Cryptography.X509Certificates;
 
 
 namespace ATLAMod.UI.BreathMeter
@@ -64,8 +65,9 @@ namespace ATLAMod.UI.BreathMeter
         //not sure what this does i dont remember
         private float glowTimer = 0f;
 
-        // shaking effect for not enough breath - cooldown handling
+        //hover stuff or something
         private int _prevShakeTicks = 0;
+        private UIElement hoverElement;
 
         public override void OnInitialize()
         {
@@ -101,7 +103,15 @@ namespace ATLAMod.UI.BreathMeter
             breathFillGlow.Width.Set(UI_WIDTH, 0f);
             breathFillGlow.Height.Set(UI_HEIGHT, 0f);
             breathFillGlow.Color = Color.Transparent;
-            breathFillContainer.Append(breathFillGlow);            
+            breathFillContainer.Append(breathFillGlow);
+
+            //hover tooltip
+            hoverElement = new UIElement();
+            hoverElement.Left.Set(UI_LEFT, 0f);
+            hoverElement.Top.Set(UI_TOP, 0f);
+            hoverElement.Width.Set(UI_WIDTH, 0f);
+            hoverElement.Height.Set(UI_HEIGHT, 0f);
+            Append(hoverElement);
 
             // border
             breathBorder = new UIImage(ModContent.Request<Texture2D>("ATLAMod/UI/BreathMeter/BreathMeterNew"));
@@ -133,7 +143,8 @@ namespace ATLAMod.UI.BreathMeter
             UpdateActiveBreathingGlow(player);
 
             //handling failbreathanimation
-            FailShake(player);
+            FailShake(player);            
+            
 
             base.Update(gameTime);
         }
@@ -315,12 +326,6 @@ namespace ATLAMod.UI.BreathMeter
             {
                 float amp = 2.5f * (shake / 12f);
                 shakeOffset = new Vector2(Main.rand.NextFloat(-amp, amp), 0f);
-
-                if (_prevShakeTicks <= 0 && shake > 0)
-                {
-                    Main.NewText("Not enough breath.");
-                    SoundEngine.PlaySound(Terraria.ID.SoundID.Item108 with { Volume = 0.6f, Pitch = 1f });
-                }
             }
             _prevShakeTicks = shake;
 
@@ -368,12 +373,15 @@ namespace ATLAMod.UI.BreathMeter
                 spriteBatch.Draw(abBorderGlow, abPosition, ABsourceRect, Color.White * 0.8f);
             }
 
-            var bp = Main.LocalPlayer.GetModPlayer<BendingPlayer>();           
-            var rect = breathBorder.GetDimensions().ToRectangle();
-            if (rect.Contains(Main.mouseX, Main.mouseY))
+            var lp = Main.LocalPlayer;
+            if (lp == null || !lp.active) return;
+
+            
+            if (hoverElement.IsMouseHovering)
             {
+                var bp = lp.GetModPlayer<BendingPlayer>();
                 int currentBreath = (int)System.MathF.Round(bp.breath);
-                Main.instance.MouseText($"Breath - {currentBreath}/{bp.maxBreath}");
+                Main.instance.MouseText($"Breath: {currentBreath}/{bp.maxBreath}");                
             }
         }
     }
