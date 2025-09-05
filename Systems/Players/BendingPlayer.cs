@@ -15,6 +15,10 @@ using ATLAMod.Buffs.FireBendingBuffs;
 using ATLAMod.Systems;
 using ATLAMod.Systems.Bending;
 using Terraria.Audio;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Steamworks;
+using ATLAMod.Systems.Players.Animation;
 
 namespace ATLAMod.Systems.Players
 {
@@ -53,7 +57,11 @@ namespace ATLAMod.Systems.Players
         public MoveSlot[] MoveSlots = new MoveSlot[6];
         public int UnlockedSlots = 2;
         public int SelectedSlotIndex = 0;
-        public bool HotbarExpanded = false;
+        public bool HotbarExpanded = false;   
+
+        //PLAYER ANIMATION HANDLING
+        public BendingAnimator Animator = new BendingAnimator();
+
 
         private readonly Dictionary<string, int> _moveCooldown = new();
 
@@ -173,7 +181,9 @@ namespace ATLAMod.Systems.Players
                 {
                     Player.AddBuff(ModContent.BuffType<airbenderBuff>(), 2);
                 }
-            }            
+            }
+
+            Animator.Update(Player);
         }
 
         private void HandleBreathRegeneration()
@@ -344,7 +354,7 @@ namespace ATLAMod.Systems.Players
             Main.NewText($"[ATLA] Cast {move.Name}");
 
             return true;
-        }
+        }     
 
         public override void ProcessTriggers(TriggersSet triggerSet)
         {

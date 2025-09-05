@@ -22,6 +22,8 @@ namespace ATLAMod.Projectiles.Firebending
         private const int FrameWidth = 60;
         private const int FrameHeight = 12;
         private const int TotalFrames = 12;
+        private const int TicksPerFrame = 2;
+        private const int VerticalStride = FrameHeight + 2;
 
         public override void SetStaticDefaults()
         {
@@ -35,7 +37,7 @@ namespace ATLAMod.Projectiles.Firebending
             Projectile.friendly = true;
             Projectile.penetrate = 1;
             Projectile.DamageType = DamageClass.Melee;
-            Projectile.timeLeft = 30;
+            Projectile.timeLeft = 180;
             Projectile.ignoreWater = true;
             Projectile.tileCollide = true;
             Projectile.extraUpdates = 0;
@@ -53,16 +55,16 @@ namespace ATLAMod.Projectiles.Firebending
             if (Projectile.velocity.LengthSquared() > 0.001f)
                 Projectile.rotation = Projectile.velocity.ToRotation();
 
-            Lighting.AddLight(Projectile.Center, 1.05f, 0.5f, 0.15f);
+            Lighting.AddLight(Projectile.Center, 0.85f, 0.65f, 0.15f);
 
             Projectile.frameCounter++;
-            if(Projectile.frameCounter >= 2)
+            if(Projectile.frameCounter >= TicksPerFrame)
             {
                 Projectile.frameCounter = 0;
                 Projectile.frame++;
                 if(Projectile.frame >= TotalFrames)
                 {
-                    Projectile.frame = TotalFrames - 1;
+                    Projectile.Kill();
                 }
             }
 
@@ -110,24 +112,27 @@ namespace ATLAMod.Projectiles.Firebending
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture, ReLogic.Content.AssetRequestMode.ImmediateLoad).Value;
-            Rectangle frameRect = new Rectangle(0, FrameHeight * Projectile.frame, FrameWidth, FrameHeight);
+
+            int srcX = 0;
+            int srcY = VerticalStride * Projectile.frame;
+            Rectangle source = new Rectangle(srcX, srcY, FrameWidth, FrameHeight);
+
             Vector2 origin = new Vector2(FrameWidth / 2f, FrameHeight / 2f);
+            SpriteEffects fx = Projectile.spriteDirection == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
 
-            // Afterimage trail
-            for (int i = 1; i < Projectile.oldPos.Length; i++)
-            {
-                if (Projectile.oldPos[i] == Vector2.Zero) continue;
-                float t = i / (float)Projectile.oldPos.Length;      // 0..1
-                float alpha = 0.5f * (1f - t);
-                Color c = new Color(255, 170, 90) * alpha;
-                Vector2 pos = Projectile.oldPos[i] + Projectile.Size * 0.5f - Main.screenPosition;
-                Main.spriteBatch.Draw(tex, pos, frameRect, c, Projectile.rotation, origin, 1f, SpriteEffects.None, 0f);
-            }
+            Main.EntitySpriteDraw(
+                tex,
+                Projectile.Center - Main.screenPosition,
+                source,
+                lightColor,
+                Projectile.rotation,
+                origin,
+                Projectile.scale,
+                fx,
+                0
+            );
 
-            // Main sprite
-            Vector2 drawPos = Projectile.Center - Main.screenPosition;
-            Main.spriteBatch.Draw(tex, drawPos, frameRect, Color.White, Projectile.rotation, origin, 1f, SpriteEffects.None, 0f);
-            return false; // we've drawn it
+            return false;
         }
     }
 }
