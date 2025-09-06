@@ -69,5 +69,4 @@ namespace ATLAMod.Effects
             }
         }
     }
-    }
 }

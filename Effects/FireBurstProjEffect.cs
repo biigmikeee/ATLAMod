@@ -16,7 +16,7 @@ namespace ATLAMod.Effects
         private const int FrameH = 52;
         private const int FrameCount = 8;
         private const int TicksPerFrame = 2; // fast pop
-        public override string Texture => "ATLAMod/Projectiles/Firebending/FireBurst8";
+        public override string Texture => "ATLAMod/Effects/fireBurstEffect";
 
         public override void SetStaticDefaults()
         {

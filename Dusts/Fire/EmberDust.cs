@@ -12,19 +12,67 @@ namespace ATLAMod.Dusts.Fire
 {
     public class EmberDust : ModDust
     {
+
+        private const int FrameW = 10;
+        private const int FrameH = 10;
+        private const int StrideY = FrameH + 2;
+        private const int FrameCount = 3;
         public override string Texture => "ATLAMod/Dusts/Fire/EmberDust";
-        // Path to your 10x36 spritesheet
 
         public override void OnSpawn(Dust dust)
         {
             dust.noGravity = true;
             dust.noLight = false;
-            dust.scale = 1f;
-            dust.frame = new Rectangle(0, 0, 10, 10); // start at frame 0
+            dust.scale = Main.rand.NextFloat(0.95f, 1.35f);
+            dust.rotation = Main.rand.NextFloat(-MathHelper.Pi, MathHelper.Pi);
+
+            if (dust.velocity.LengthSquared() < 0.001f)
+            {
+                dust.velocity = Main.rand.NextVector2Circular(1.2f, 1.2f);
+            }
+
+            int frameIndex = Main.rand.Next(FrameCount);
+            dust.frame = new Rectangle(0, frameIndex * StrideY, 10, 10);
+
+            dust.customData = new DustState
+            {
+                FrameTimer = 0,
+                SpinDir = Main.rand.NextBool() ? 1 : -1
+
+            };
+        }
+
+        private class DustState
+        {
+            public int FrameTimer;
+            public int SpinDir;
         }
 
         public override bool Update(Dust dust)
         {
+            if (dust.customData is DustState state)
+            {
+                state.FrameTimer++;
+                if (state.FrameTimer % 4 == 0)
+                {
+                    int curIndex = dust.frame.Y / 12;
+                    int nextIndex = (curIndex + 1) % 3;
+                    dust.frame.Y = nextIndex * 12;
+                }
+
+                dust.rotation += 0.12f * state.SpinDir;
+            }
+
+            dust.position += dust.velocity;
+            dust.velocity *= 0.965f;
+            dust.velocity.Y -= 0.02f;
+
+            Lighting.AddLight(dust.position, 0.9f * dust.scale, 0.5f * dust.scale, 0.08f * dust.scale);
+            dust.scale *= 0.985f;
+            dust.alpha = (int)MathHelper.Clamp(255f * (1.25f - dust.scale), 0f, 160f);
+
+            if (dust.scale < 0.45f)
+                dust.active = false;
 
             return false;
         }

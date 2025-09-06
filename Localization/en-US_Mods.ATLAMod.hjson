@@ -43,4 +43,7 @@ Keybinds: {
 	"Toggle Moveset Hotbar.DisplayName": Toggle  Moveset  Hotbar
 }
 
-Projectiles.FireFistProj.DisplayName: Fire Fist Proj
+Projectiles: {
+	FireFistProj.DisplayName: Fire Fist Proj
+	FireBurstProjEffect.DisplayName: Fire Burst Proj Effect
+}
