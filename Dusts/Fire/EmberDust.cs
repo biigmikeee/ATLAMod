@@ -25,6 +25,7 @@ namespace ATLAMod.Dusts.Fire
 
         public override bool Update(Dust dust)
         {
+
             return false;
         }
 

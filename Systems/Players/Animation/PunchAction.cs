@@ -18,7 +18,7 @@ namespace ATLAMod.Systems.Players.Animation
         private bool fired;
         private readonly System.Action fire;
 
-        public PunchAction (Vector2 aimDir, int windupTicks, int strikeTicks, int recoverTicks, int bodyWalkIndex = 4, int legWalkIndex = 5, System.Action onFire = null)
+        public PunchAction (Vector2 aimDir, int windupTicks, int strikeTicks, int recoverTicks, int bodyWalkIndex = 4, int legWalkIndex = 7, System.Action onFire = null)
         {
             aim = aimDir.LengthSquared() > 0 ? Vector2.Normalize(aimDir) : new Vector2(1, 0);
             windup = windupTicks; strike = strikeTicks; recover = recoverTicks;

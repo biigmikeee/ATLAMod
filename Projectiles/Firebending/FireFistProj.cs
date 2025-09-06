@@ -69,7 +69,7 @@ namespace ATLAMod.Projectiles.Firebending
             }
 
             Projectile.localAI[0]++;
-            if (Projectile.localAI[0] >= 4 && Main.rand.NextBool(2))
+            if (Projectile.localAI[0] >= 4 && Main.rand.NextBool(6))
             {
                 var d = Dust.NewDustDirect(Projectile.Center - new Vector2(5, 5), 10, 10, ModContent.DustType<EmberDust>(), 0f, 0f, 0, default, Main.rand.NextFloat(0.95f, 1.1f));
 
@@ -95,17 +95,7 @@ namespace ATLAMod.Projectiles.Firebending
 
         private void ImpactBurst()
         {
-            // small burst of your custom embers on impact
-            for (int i = 0; i < 8; i++)
-            {
-                var d = Dust.NewDustDirect(
-                    Projectile.Center - new Vector2(5, 5), 10, 10,
-                    ModContent.DustType<EmberDust>(),
-                    0f, 0f, 0, default, Main.rand.NextFloat(0.95f, 1.1f)
-                );
-                d.velocity = Main.rand.NextVector2Circular(1.8f, 1.8f);
-                d.alpha = 0;
-            }
+            
         }
 
         // Draw: pick the correct frame from the vertical sheet and add a soft afterimage trail

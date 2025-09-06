@@ -40,7 +40,7 @@ namespace ATLAMod.Systems.Bending.Moves.Fire
             int dmg = 30; float kb = 3f; int owner = p.whoAmI;
 
             //player animation
-            bp.Animator.Play(new PunchAction(aim, 7, 5, 8, 4, 5, () =>
+            bp.Animator.Play(new PunchAction(aim, 7, 5, 8, 4, 7, () =>
             {
                 Projectile.NewProjectile(p.GetSource_FromThis(), spawn, vel, projType, dmg, kb, owner);
             }
