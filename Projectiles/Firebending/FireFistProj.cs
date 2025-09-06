@@ -97,7 +97,7 @@ namespace ATLAMod.Projectiles.Firebending
         }       
 
         private void ImpactBurst()
-        {            
+        {                        
 
             Vector2 pos = Projectile.Center;
 
@@ -106,20 +106,7 @@ namespace ATLAMod.Projectiles.Firebending
             if (normal.LengthSquared() < 0.0001f) normal = new Vector2(Projectile.spriteDirection, 0f);
             normal.Normalize();
 
-            float speed = Projectile.oldVelocity.Length();
-            float scale = MathHelper.Clamp(speed / 12f, 0.8f, 1.3f);
-
-            float rot = normal.ToRotation();
-
-            Projectile.NewProjectile(
-                Projectile.GetSource_FromThis(),
-                pos,
-                Vector2.Zero,
-                ModContent.ProjectileType<FireBurstProjEffect>(),
-                0, 0f,
-                Projectile.owner,
-                rot,
-                scale);
+            FireBurstEffects.SpawnBurst(pos, normal, FireBurstEffects.BurstSize.Small, Projectile.owner, baseDamage: 0);
 
             SoundEngine.PlaySound(SoundID.Item74 with { Volume = 0.85f, PitchVariance = 0.15f }, pos);            
             Lighting.AddLight(pos, 1.2f, 0.6f, 0.15f);

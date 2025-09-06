@@ -60,7 +60,7 @@ namespace ATLAMod.Dusts.Fire
                     dust.frame.Y = nextIndex * StrideY;
                 }
 
-                dust.rotation += 0.12f * state.SpinDir;
+                dust.rotation += 0.08f * state.SpinDir;
             }
 
             dust.position += dust.velocity;
