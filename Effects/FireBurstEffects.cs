@@ -23,7 +23,7 @@ namespace ATLAMod.Effects
             switch (size)
             {
                 case BurstSize.Small: scale = 0.7f; dustCount = 8; emberSpeed = 3.0f; break;
-                case BurstSize.Medium: scale = 0.1f; dustCount = 14; emberSpeed = 3.8f; break;
+                case BurstSize.Medium: scale = 1.0f; dustCount = 14; emberSpeed = 3.8f; break;
                 default: scale = 1.3f; dustCount = 20; emberSpeed = 4.6f; break;
             }
 

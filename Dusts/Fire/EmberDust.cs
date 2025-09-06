@@ -55,9 +55,9 @@ namespace ATLAMod.Dusts.Fire
                 state.FrameTimer++;
                 if (state.FrameTimer % 4 == 0)
                 {
-                    int curIndex = dust.frame.Y / 12;
-                    int nextIndex = (curIndex + 1) % 3;
-                    dust.frame.Y = nextIndex * 12;
+                    int curIndex = dust.frame.Y / StrideY;
+                    int nextIndex = (curIndex + 1) % FrameCount;
+                    dust.frame.Y = nextIndex * StrideY;
                 }
 
                 dust.rotation += 0.12f * state.SpinDir;
@@ -79,9 +79,7 @@ namespace ATLAMod.Dusts.Fire
 
         public override bool PreDraw(Dust dust)
         {
-
-
-            return false; // don’t let vanilla draw
+            return true;
         }
     }
 }
