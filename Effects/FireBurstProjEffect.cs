@@ -15,7 +15,9 @@ namespace ATLAMod.Effects
         private const int FrameW = 48;
         private const int FrameH = 52;
         private const int FrameCount = 8;
+        private const int VerticalStride = FrameH + 2;
         private const int TicksPerFrame = 2; // fast pop
+
         public override string Texture => "ATLAMod/Effects/fireBurstEffect";
 
         public override void SetStaticDefaults()
@@ -50,8 +52,7 @@ namespace ATLAMod.Effects
                 Projectile.frame++;
                 if (Projectile.frame >= FrameCount)
                 {
-                    Projectile.Kill();
-                    return;
+                    Projectile.Kill();                    
                 }
             }
 
@@ -62,13 +63,16 @@ namespace ATLAMod.Effects
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D tex = ModContent.Request<Texture2D>(Texture).Value;
-            Rectangle src = new Rectangle(0, FrameH * Projectile.frame, FrameW, FrameH);
+            int srcX = 0;
+            int srcY = VerticalStride * Projectile.frame;
+            Rectangle source = new Rectangle(srcX, srcY, FrameW, FrameH);
+            
             Vector2 origin = new Vector2(FrameW / 2f, FrameH / 2f);
 
             Main.EntitySpriteDraw(
                 tex,
                 Projectile.Center - Main.screenPosition,
-                src,
+                source,
                 Color.White,
                 Projectile.rotation,
                 origin,
