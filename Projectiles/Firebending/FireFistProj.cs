@@ -27,6 +27,8 @@ namespace ATLAMod.Projectiles.Firebending
         private const int TicksPerFrame = 2;
         private const int VerticalStride = FrameHeight + 2;
 
+        private bool _burstDone;
+
         public override void SetStaticDefaults()
         {
             Main.projFrames[Type] = TotalFrames;
@@ -34,8 +36,8 @@ namespace ATLAMod.Projectiles.Firebending
 
         public override void SetDefaults()
         {
-            Projectile.width = FrameWidth;
-            Projectile.height = FrameHeight;
+            Projectile.width = 48;
+            Projectile.height = 8;
             Projectile.friendly = true;
             Projectile.penetrate = 1;
             Projectile.DamageType = DamageClass.Melee;
@@ -94,83 +96,20 @@ namespace ATLAMod.Projectiles.Firebending
             // on-hit burst for feedback
             ImpactBurst();
             Projectile.Kill();
-        }       
+        }
 
         private void ImpactBurst()
-        {                        
+        {
+            if (_burstDone) return;
+            _burstDone = true;
 
-            Vector2 pos = Projectile.Center;
+            var src = Projectile.GetSource_Death();
 
-            // Impact normal: use incoming velocity; fallback to facing dir
             Vector2 normal = Projectile.oldVelocity;
-            if (normal.LengthSquared() < 0.0001f) normal = new Vector2(Projectile.spriteDirection, 0f);
+            if (normal.LengthSquared() < 0.001f) normal = new Vector2(Projectile.spriteDirection, 0f);
             normal.Normalize();
 
-            FireBurstEffects.SpawnBurst(pos, normal, FireBurstEffects.BurstSize.Small, Projectile.owner, baseDamage: 0);
-
-            SoundEngine.PlaySound(SoundID.Item74 with { Volume = 0.85f, PitchVariance = 0.15f }, pos);            
-            Lighting.AddLight(pos, 1.2f, 0.6f, 0.15f);
-
-            // --- OPTIONAL: tiny hit-stop + micro screen shake for local player ---
-            if (Main.myPlayer == Projectile.owner)
-            {
-                // Hit-stop feel: briefly slow the local player (1–2 ticks)
-                Player lp = Main.LocalPlayer;
-                lp.velocity *= 0.92f;
-
-                // Micro “shake”: nudge the screen once (kept subtle)
-                Main.screenPosition += Main.rand.NextVector2Circular(1.5f, 1.5f);
-            }
-
-            // --- DUST: EMBER RING + SPARKS ---
-            // Size scales a bit with projectile speed so faster hits pop harder
-            float speedMag = MathHelper.Clamp(Projectile.oldVelocity.Length(), 4f, 18f);
-            int emberCount = (int)MathHelper.Lerp(10, 20, (speedMag - 4f) / 14f);
-
-            for (int i = 0; i < emberCount; i++)
-            {
-                // Wide cone around the impact normal
-                Vector2 dir = normal.RotatedBy(MathHelper.ToRadians(Main.rand.NextFloat(-85f, 85f)));
-                float spd = Main.rand.NextFloat(1.2f, 3.8f) * (speedMag / 12f);
-
-                int d = Dust.NewDust(pos - new Vector2(8f), 16, 16,
-                                     ModContent.DustType<EmberDust>(),
-                                     dir.X * spd, dir.Y * spd,
-                                     0, default,
-                                     Main.rand.NextFloat(1.0f, 1.35f));
-
-                Main.dust[d].noGravity = true;
-                Main.dust[d].fadeIn = Main.rand.NextFloat(0.25f, 0.55f);
-                Main.dust[d].alpha = 0;
-            }
-
-            // --- DUST: A FEW THICKER TORCH FLARES FOR BODY ---
-            for (int i = 0; i < emberCount / 3; i++)
-            {
-                Vector2 dir = normal.RotatedByRandom(MathHelper.ToRadians(55));
-                float spd = Main.rand.NextFloat(0.6f, 1.8f) * (speedMag / 12f);
-
-                int d = Dust.NewDust(pos - new Vector2(10f), 20, 20,
-                                     Terraria.ID.DustID.Torch,
-                                     dir.X * spd, dir.Y * spd,
-                                     100, default,
-                                     Main.rand.NextFloat(1.25f, 1.65f));
-                Main.dust[d].noGravity = true;
-            }
-
-            // --- DUST: A FEW SMOKE WISPS FOR DECAY ---
-            for (int i = 0; i < emberCount / 4; i++)
-            {
-                Vector2 dir = normal.RotatedByRandom(MathHelper.ToRadians(45));
-                float spd = Main.rand.NextFloat(0.4f, 1.2f);
-
-                int d = Dust.NewDust(pos - new Vector2(12f), 24, 24,
-                                     Terraria.ID.DustID.Smoke,
-                                     dir.X * spd, dir.Y * spd,
-                                     140, default,
-                                     Main.rand.NextFloat(1.0f, 1.4f));
-                Main.dust[d].noGravity = false;
-            }
+            FireBurstEffects.SpawnBurst(src, Projectile.Center, normal, FireBurstEffects.BurstSize.Small, Projectile.owner);
         }
        
         public override bool PreDraw(ref Color lightColor)

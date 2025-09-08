@@ -61,9 +61,10 @@ namespace ATLAMod.Systems.Players
 
         //PLAYER ANIMATION HANDLING
         public BendingAnimator Animator = new BendingAnimator();
-
-
+        private readonly List<(int ticks, Action action)> _timers = new();
+        public void RunAfter(int ticks, Action action) => _timers.Add((ticks, action));
         private readonly Dictionary<string, int> _moveCooldown = new();
+
 
         public override void Initialize()
         {
@@ -181,6 +182,15 @@ namespace ATLAMod.Systems.Players
                 {
                     Player.AddBuff(ModContent.BuffType<airbenderBuff>(), 2);
                 }
+            }
+
+            //attack timing control
+            for (int i = _timers.Count - 1; i >= 0; --i)
+            {
+                var (t, a) = _timers[i];
+                t--;
+                if (t <= 0) { a?.Invoke(); _timers.RemoveAt(i); }
+                else _timers[i] = (t, a);
             }
 
             Animator.Update(Player);

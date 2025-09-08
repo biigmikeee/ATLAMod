@@ -17,30 +17,37 @@ namespace ATLAMod.Effects
     {
         public enum BurstSize { Small, Medium, Large }
 
-        public static void SpawnBurst (Vector2 pos, Vector2 normal, BurstSize size, int owner, int baseDamage = 0)
+        public static void SpawnBurst (IEntitySource source, Vector2 pos, Vector2 normal, BurstSize size, int owner)
         {
             float scale; int frames = 8; int dustCount; float emberSpeed;
             switch (size)
             {
-                case BurstSize.Small: scale = 0.7f; dustCount = 8; emberSpeed = 3.0f; break;
-                case BurstSize.Medium: scale = 1.0f; dustCount = 14; emberSpeed = 3.8f; break;
-                default: scale = 1.3f; dustCount = 20; emberSpeed = 4.6f; break;
+                case BurstSize.Small: scale = 1.25f; dustCount = 8; emberSpeed = 3.0f; break;
+                case BurstSize.Medium: scale = 1.5f; dustCount = 14; emberSpeed = 3.8f; break;
+                default: scale = 1.75f; dustCount = 20; emberSpeed = 4.6f; break;
             }
 
             int type = ModContent.ProjectileType<FireBurstProjEffect>();
-            int who = Main.myPlayer; // purely visual; owner can be spawner
-            float rot = normal.ToRotation();
-            int proj = Projectile.NewProjectile(
-                spawnSource: new EntitySource_Misc("FireBurstEffects"),
-                position: pos,
-                velocity: Vector2.Zero,
-                Type: type,
-                Damage: baseDamage, // usually 0 (visual); could add tiny AOE if desired
-                KnockBack: 0f,
-                Owner: owner >= 0 ? owner : who,
-                ai0: rot,          // pass rotation through ai
-                ai1: scale         // pass scale through ai
-            );
+            var proj = Projectile.NewProjectileDirect(source, pos, Vector2.Zero, type, 0, 0f, owner);
+
+            if (proj != null)
+            {
+                if (normal.LengthSquared() < 0.0001f) normal = Vector2.UnitX;
+                scale = size switch
+                {
+                    BurstSize.Small => 1.25f,
+                    BurstSize.Medium => 1.5f,
+                    BurstSize.Large => 1.75f,
+                    _ => 1f
+                };
+
+                proj.rotation = normal.ToRotation();
+                proj.scale = scale;
+                proj.netUpdate = true;
+            }
+            
+            
+                       
 
             // Sound (swap to your custom SoundStyle if you have one)
             SoundEngine.PlaySound(SoundID.Item74 with { Volume = 0.8f, PitchVariance = 0.15f }, pos);
@@ -69,4 +76,5 @@ namespace ATLAMod.Effects
             }
         }
     }
+
 }

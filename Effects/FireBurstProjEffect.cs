@@ -32,11 +32,11 @@ namespace ATLAMod.Effects
             Projectile.friendly = false;
             Projectile.hostile = false;
             Projectile.penetrate = -1;
-            Projectile.timeLeft = 60; // safety
+            Projectile.timeLeft = FrameCount * TicksPerFrame + 2;
             Projectile.tileCollide = false;
             Projectile.ignoreWater = true;
             Projectile.alpha = 0;
-            Projectile.hide = true; // visual only
+            Projectile.hide = false;
         }
 
         public override void AI()
