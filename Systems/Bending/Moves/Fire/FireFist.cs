@@ -40,17 +40,27 @@ namespace ATLAMod.Systems.Bending.Moves.Fire
             Vector2 vel = Vector2.Normalize(aim) * 8f;
             int dmg = 30; float kb = 3f; int owner = p.whoAmI;
 
-            const int impactDelayTicks = 3;
-            const float forward = 8f;
-            const float up = 0f;
+            const int impactDelayTicks = 5;
+            const float forward = 50f;
+            const float up = 8f;
 
             //player animation
             bp.Animator.Play(new PunchAction(aim, 7, 5, 8, 4, 7, () =>
             {
 
                 bp.RunAfter(impactDelayTicks, () =>
-                {                    
-                    Projectile.NewProjectile(p.GetSource_FromThis(), spawn, vel, projType, dmg, kb, owner);
+                {
+                    Vector2 basePt = p.RotatedRelativePoint(p.MountedCenter, true);
+                    Vector2 spawnCenter = basePt + new Vector2(forward, up).RotatedBy(aim.ToRotation());
+
+                    const int projW = 36, projH = 12;
+                    Vector2 spawnTopLeft = spawnCenter - new Vector2(projW * 0.5f, projH * 0.5f);
+
+                    //avoiding wall collision on spawn
+                    for (int i = 0; i < 3 && Collision.SolidCollision(spawnTopLeft, projW, projH); i++)
+                        spawnTopLeft += aim * 4f;
+
+                    Projectile.NewProjectile(p.GetSource_FromThis(), spawnTopLeft, aim * 8f, projType, dmg, kb, owner);
                 });
             }));                    
         }
