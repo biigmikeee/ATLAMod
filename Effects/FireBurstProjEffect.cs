@@ -37,12 +37,13 @@ namespace ATLAMod.Effects
             Projectile.ignoreWater = true;
             Projectile.alpha = 0;
             Projectile.hide = false;
+            
         }
 
         public override void AI()
         {
             // ai[0] = rotation, ai[1] = scale
-            Projectile.rotation = Projectile.ai[0];
+            Projectile.rotation = Projectile.velocity.ToRotation();
             Projectile.scale = (Projectile.ai[1] == 0f ? 1f : Projectile.ai[1]);
 
             Projectile.frameCounter++;
@@ -68,10 +69,11 @@ namespace ATLAMod.Effects
             Rectangle source = new Rectangle(srcX, srcY, FrameW, FrameH);
             
             Vector2 origin = new Vector2(FrameW / 2f, FrameH / 2f);
+            float offsetX = (Projectile.spriteDirection == 1 ? 28f : -28f);
 
             Main.EntitySpriteDraw(
                 tex,
-                Projectile.Center - Main.screenPosition,
+                Projectile.Center - Main.screenPosition + new Vector2(offsetX, 0f),
                 source,
                 Color.White,
                 Projectile.rotation,
