@@ -41,6 +41,7 @@
 	  <None Remove="Assets\UITextures\bendingChooseUI\earthGlowButton.png" />
 	  <None Remove="Assets\UITextures\bendingChooseUI\fireGlowButton.png" />
 	  <None Remove="Assets\UITextures\bendingChooseUI\waterGlowButton.png" />
+	  <None Remove="Assets\UITextures\hotbarAttackIcons\Fire\fireFistHotbarIcon.png" />
 	  <None Remove="Assets\UITextures\whitePixel.png" />
 	  <None Remove="Buffs\BendingStyles\airbenderBuff.png" />
 	  <None Remove="Buffs\BendingStyles\earthbenderBuff.png" />

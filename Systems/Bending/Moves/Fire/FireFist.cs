@@ -21,8 +21,8 @@ namespace ATLAMod.Systems.Bending.Moves.Fire
             id: "fire_fist",
             name: "Fire Fist",
             style: BendingPlayer.BendingStyle.Fire,
-            iconPath: "ATLAMod/Assets/UITextures/attackHotbarTest/firefistIconTest",
-            cost: 10,
+            iconPath: "ATLAMod/Assets/UITextures/hotbarAttackIcons/Fire/fireFistHotbarIcon",
+            cost: 1,
             cdTicks: 30)
         { }
 
@@ -34,6 +34,7 @@ namespace ATLAMod.Systems.Bending.Moves.Fire
             // face the cursor
             Vector2 aim = p.DirectionTo(Main.MouseWorld);
             if (aim.LengthSquared() < 0.001f) aim = new Vector2(p.direction, 0f);
+
 
             int projType = ModContent.ProjectileType<FireFistProj>();
             Vector2 spawn = p.Center + Vector2.Normalize(aim) * 20f;
@@ -50,17 +51,44 @@ namespace ATLAMod.Systems.Bending.Moves.Fire
 
                 bp.RunAfter(impactDelayTicks, () =>
                 {
-                    Vector2 basePt = p.RotatedRelativePoint(p.MountedCenter, true);
-                    Vector2 spawnCenter = basePt + new Vector2(forward, up).RotatedBy(aim.ToRotation());
+                    Vector2 along = p.DirectionTo(Main.MouseWorld);
+                    if (along.LengthSquared() < 0.001f) along = new Vector2(p.direction, 0f);
+                    along.Normalize();
 
-                    const int projW = 36, projH = 12;
+                    Vector2 perp = new Vector2(-along.Y * p.gravDir, along.X * p.gravDir);
+
+                    Vector2 facing = new Vector2(p.direction, 0f);
+                    if (Vector2.Dot(perp, facing) < 0f) perp = -perp;
+
+                    const float shoulderForward = 10f;
+                    const float shoulderUp = -10f;
+
+                    const float forwardFront = 50f;
+                    const float forwardBack = 100f;
+                    const float lateral = 8f;
+
+                    Vector2 basePt = p.RotatedRelativePoint(p.MountedCenter, true);
+                    Vector2 shoulder = basePt + facing * shoulderForward + new Vector2(0f, shoulderUp * p.gravDir);
+
+                    float facingDot = MathHelper.Clamp(Vector2.Dot(along, facing), -1f, 1f);
+                    float forward = MathHelper.Lerp(forwardBack, forwardFront, 0.5f * (facingDot + 1f));
+
+                    Vector2 spawnCenter = shoulder + along * forward + perp * lateral;
+
+                    const int projW = 60, projH = 12;
                     Vector2 spawnTopLeft = spawnCenter - new Vector2(projW * 0.5f, projH * 0.5f);
 
-                    //avoiding wall collision on spawn
                     for (int i = 0; i < 3 && Collision.SolidCollision(spawnTopLeft, projW, projH); i++)
-                        spawnTopLeft += aim * 4f;
+                        spawnTopLeft += along * 4f;
 
-                    Projectile.NewProjectile(p.GetSource_FromThis(), spawnTopLeft, aim * 8f, projType, dmg, kb, owner);
+                    Vector2 finalVel = along * 8f;
+
+                    Projectile.NewProjectile(
+                        p.GetSource_FromThis(),
+                        spawnTopLeft,
+                        finalVel,
+                        ModContent.ProjectileType<FireFistProj>(),
+                        dmg, kb, p.whoAmI);
                 });
             }));                    
         }

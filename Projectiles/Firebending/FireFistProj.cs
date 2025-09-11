@@ -36,7 +36,7 @@ namespace ATLAMod.Projectiles.Firebending
 
         public override void SetDefaults()
         {
-            Projectile.width = 48;
+            Projectile.width = 32;
             Projectile.height = 8;
             Projectile.friendly = true;
             Projectile.penetrate = 1;
