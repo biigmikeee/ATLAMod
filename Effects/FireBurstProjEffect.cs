@@ -41,10 +41,7 @@ namespace ATLAMod.Effects
         }
 
         public override void AI()
-        {
-            // ai[0] = rotation, ai[1] = scale
-            Projectile.rotation = Projectile.velocity.ToRotation();
-            Projectile.scale = (Projectile.ai[1] == 0f ? 1f : Projectile.ai[1]);
+        {                        
 
             Projectile.frameCounter++;
             if (Projectile.frameCounter >= TicksPerFrame)
@@ -69,17 +66,27 @@ namespace ATLAMod.Effects
             Rectangle source = new Rectangle(srcX, srcY, FrameW, FrameH);
             
             Vector2 origin = new Vector2(FrameW / 2f, FrameH / 2f);
-            float offsetX = (Projectile.spriteDirection == 1 ? 28f : -28f);
+
+            Vector2 along = new Vector2((float)Math.Cos(Projectile.rotation), (float)Math.Sin(Projectile.rotation));
+
+            float inset = Projectile.ai[0];
+            float lateral = Projectile.ai[1];
+
+            Vector2 drawPos = Projectile.Center - along * inset - Main.screenPosition;
+
+            Vector2 drawWorld = Projectile.Center - along * inset + new Vector2(Projectile.spriteDirection * lateral, 0f);
+
+            SpriteEffects fx = SpriteEffects.FlipHorizontally;
 
             Main.EntitySpriteDraw(
                 tex,
-                Projectile.Center - Main.screenPosition + new Vector2(offsetX, 0f),
+                drawWorld - Main.screenPosition,
                 source,
                 Color.White,
                 Projectile.rotation,
                 origin,
                 Projectile.scale,
-                SpriteEffects.None,
+                fx,
                 0
             );
             return false;

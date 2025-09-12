@@ -33,16 +33,15 @@ namespace ATLAMod.Effects
             if (proj != null)
             {
                 if (normal.LengthSquared() < 0.0001f) normal = Vector2.UnitX;
-                scale = size switch
-                {
-                    BurstSize.Small => 1.25f,
-                    BurstSize.Medium => 1.5f,
-                    BurstSize.Large => 1.75f,
-                    _ => 1f
-                };
 
                 proj.rotation = normal.ToRotation();
                 proj.scale = scale;
+
+                proj.spriteDirection = proj.direction;
+
+                proj.ai[0] = 24f * scale;
+                proj.ai[1] = 8f;
+
                 proj.netUpdate = true;
             }
             
