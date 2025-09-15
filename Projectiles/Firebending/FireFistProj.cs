@@ -36,8 +36,8 @@ namespace ATLAMod.Projectiles.Firebending
 
         public override void SetDefaults()
         {
-            Projectile.width = 32;
-            Projectile.height = 8;
+            Projectile.width = FrameWidth;
+            Projectile.height = FrameHeight;
             Projectile.friendly = true;
             Projectile.penetrate = 1;
             Projectile.DamageType = DamageClass.Melee;
