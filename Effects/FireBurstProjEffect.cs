@@ -53,8 +53,7 @@ namespace ATLAMod.Effects
                     Projectile.Kill();                    
                 }
             }
-
-            // brief bright light
+            
             Lighting.AddLight(Projectile.Center, 1.0f * Projectile.scale, 0.5f * Projectile.scale, 0.12f * Projectile.scale);
         }
 

@@ -44,7 +44,7 @@ namespace ATLAMod.Projectiles.Firebending
             Projectile.timeLeft = 180;
             Projectile.ignoreWater = true;
             Projectile.tileCollide = true;
-            Projectile.extraUpdates = 0;
+            Projectile.extraUpdates = 1;
 
         }
 
@@ -85,10 +85,9 @@ namespace ATLAMod.Projectiles.Firebending
         }
 
         public override bool OnTileCollide(Vector2 oldVelocity)
-        {
-            // small impact puff + sound
+        {            
             ImpactBurst();
-            return true; // kill on hit
+            return true;
         }
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -106,10 +105,20 @@ namespace ATLAMod.Projectiles.Firebending
             var src = Projectile.GetSource_Death();
 
             Vector2 normal = Projectile.oldVelocity;
+            if (normal.LengthSquared() < 0.001f) normal = Projectile.velocity;
             if (normal.LengthSquared() < 0.001f) normal = new Vector2(Projectile.spriteDirection, 0f);
             normal.Normalize();
 
-            FireBurstEffects.SpawnBurst(src, Projectile.Center, normal, FireBurstEffects.BurstSize.Small, Projectile.owner);
+            float spriteHalf = 60f * 0.5f - 1f;
+
+            float aabbHalf = Math.Abs(normal.X) * (Projectile.width * 0.5f - 1f) +
+                Math.Abs(normal.Y) * (Projectile.height * 0.5f - 1f);
+
+            float noseDist = Math.Min(spriteHalf, Math.Max(0f, aabbHalf));
+
+            Vector2 hitPos = Projectile.Center + normal * noseDist;
+
+            FireBurstEffects.SpawnBurst(src, hitPos, normal, FireBurstEffects.BurstSize.Small, Projectile.owner);
         }
        
         public override bool PreDraw(ref Color lightColor)

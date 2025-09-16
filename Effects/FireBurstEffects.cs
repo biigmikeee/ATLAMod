@@ -39,8 +39,8 @@ namespace ATLAMod.Effects
 
                 proj.spriteDirection = proj.direction;
 
-                proj.ai[0] = 24f * scale;
-                proj.ai[1] = 8f;
+                proj.ai[0] = 0f;
+                proj.ai[1] = 0f;
 
                 proj.netUpdate = true;
             }

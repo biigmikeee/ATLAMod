@@ -66,14 +66,31 @@ namespace ATLAMod.Systems.Bending.Moves.Fire
 
                     Vector2 spawnCenter = shoulder + along * forward + perp * lateral;
 
-                    const int projW = 60, projH = 12;                                                           
+                    //close projectile collision fixes
+                    const int projW = 60, projH = 12;
+                    Vector2 half = new Vector2(projW * 0.5f, projH * 0.5f);
 
-                    for (int i = 0; i < 3 && Collision.SolidCollision(spawnCenter - new Vector2(projW * 0.5f, projH * 0.5f), projW, projH); i++)
-                        spawnCenter += along * 4f;
+                    if (Collision.SolidCollision(spawnCenter - half, projW, projH))
+                    {
+                        for (int i = 0; i < 3 && Collision.SolidCollision(spawnCenter - new Vector2(projW * 0.5f, projH * 0.5f), projW, projH); i++)
+                            spawnCenter += along * 4f;
+
+                        if (Collision.SolidCollision(spawnCenter - half, projW, projH))
+                        {
+                            Vector2 lo = basePt;
+                            Vector2 hi = spawnCenter;
+                            for (int i = 0; i < 8; i++)
+                            {
+                                Vector2 mid = (lo + hi) * 0.5f;
+                                if (Collision.SolidCollision(mid - half, projW, projH)) hi = mid; else lo = mid;
+                            }
+                            spawnCenter = (lo + hi) * 0.5f;
+                        }
+                    }                    
 
                     int type = ModContent.ProjectileType<FireFistProj>();
                     int dmg = 30; float kb = 3f;
-                    Vector2 vel = along * 8f;
+                    Vector2 vel = along * 4f;
 
                     Projectile.NewProjectile(
                         p.GetSource_FromThis(),
