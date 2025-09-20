@@ -19,6 +19,14 @@ namespace ATLAMod.Dusts.Fire
         private const int FrameCount = 3;
         public override string Texture => "ATLAMod/Dusts/Fire/EmberDust";
 
+        private class DustState
+        {
+            public int FrameTimer;
+            public int FrameIndex;
+            public int TicksPerFrame;
+            public int SpinDir;
+        }
+
         public override void OnSpawn(Dust dust)
         {
             dust.noGravity = true;
@@ -31,36 +39,37 @@ namespace ATLAMod.Dusts.Fire
                 dust.velocity = Main.rand.NextVector2Circular(1.2f, 1.2f);
             }
 
-            int frameIndex = Main.rand.Next(FrameCount);
-            dust.frame = new Rectangle(0, frameIndex * StrideY, 10, 10);
-
-            dust.customData = new DustState
+            var state = new DustState
             {
                 FrameTimer = 0,
+                FrameIndex = Main.rand.NextBool() ? 0 : 1,
+                TicksPerFrame = 3,
                 SpinDir = Main.rand.NextBool() ? 1 : -1
-
             };
-        }
+            dust.customData = state;
 
-        private class DustState
-        {
-            public int FrameTimer;
-            public int SpinDir;
+            dust.frame = new Rectangle(0, 0, FrameW, FrameH);
         }
-
         public override bool Update(Dust dust)
         {
             if (dust.customData is DustState state)
             {
                 state.FrameTimer++;
-                if (state.FrameTimer % 4 == 0)
+                if (state.FrameTimer >= state.TicksPerFrame)
                 {
-                    int curIndex = dust.frame.Y / StrideY;
-                    int nextIndex = (curIndex + 1) % FrameCount;
-                    dust.frame.Y = nextIndex * StrideY;
+                    state.FrameTimer = 0;
+                    state.FrameIndex++;
+
+                    if (state.FrameIndex >= FrameCount)
+                    {
+                        dust.active = false;
+                        return false;
+                    }
+
+                    dust.frame.Y = state.FrameIndex * StrideY;
                 }
 
-                dust.rotation += 0.08f * state.SpinDir;
+                dust.rotation *= 0.12f * state.SpinDir;
             }
 
             dust.position += dust.velocity;
