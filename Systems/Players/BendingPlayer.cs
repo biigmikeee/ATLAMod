@@ -65,6 +65,37 @@ namespace ATLAMod.Systems.Players
         public void RunAfter(int ticks, Action action) => _timers.Add((ticks, action));
         private readonly Dictionary<string, int> _moveCooldown = new();
 
+        public struct AttackUpgrades
+        {
+            public float MeleeDamageMult;
+            public float ProjectileDamageMult;
+            public float MovementDamageMult;
+            public float DashIFramesBonus;
+            public float CooldownMult;
+            public float CostMult;
+        }
+
+        public AttackUpgrades Up = new AttackUpgrades
+        {
+            MeleeDamageMult = 1f,
+            ProjectileDamageMult = 1f,
+            MovementDamageMult = 1f,
+            DashIFramesBonus = 0f,
+            CooldownMult = 1f,
+            CostMult = 1f,
+        };
+
+        public float GetDamageMult(AttackTags tags)
+        {
+            float m = 1f;
+            if ((tags & AttackTags.Melee) != 0) m *= Up.MeleeDamageMult;
+            if ((tags & AttackTags.Projectile) != 0) m *= Up.ProjectileDamageMult;
+
+            return m;
+        }
+
+        public float GetCooldownMult(AttackTags tags) => Up.CooldownMult;
+        public float GetCostMult(AttackTags tags) => Up.CostMult;
 
         public override void Initialize()
         {

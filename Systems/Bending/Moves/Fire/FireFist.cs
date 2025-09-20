@@ -24,7 +24,7 @@ namespace ATLAMod.Systems.Bending.Moves.Fire
             iconPath: "ATLAMod/Assets/UITextures/hotbarAttackIcons/Fire/fireFistHotbarIcon",
             cost: 1,
             cdTicks: 30)
-        { }
+        { Tags = AttackTags.Projectile; }
 
         public override void OnUse(Player p, BendingPlayer bp)
         {
