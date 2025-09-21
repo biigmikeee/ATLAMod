@@ -19,6 +19,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Steamworks;
 using ATLAMod.Systems.Players.Animation;
+using Terraria.DataStructures;
 
 namespace ATLAMod.Systems.Players
 {
@@ -57,7 +58,13 @@ namespace ATLAMod.Systems.Players
         public MoveSlot[] MoveSlots = new MoveSlot[6];
         public int UnlockedSlots = 2;
         public int SelectedSlotIndex = 0;
-        public bool HotbarExpanded = false;   
+        public bool HotbarExpanded = false;
+
+
+        private Item _heldStash;
+        private int _heldIndex = -1;
+        private bool _heldSwappedThisTick;
+        private bool InAttackMode => HotbarExpanded || (Animator?.IsBusy ?? false);
 
         //PLAYER ANIMATION HANDLING
         public BendingAnimator Animator = new BendingAnimator();
@@ -247,6 +254,20 @@ namespace ATLAMod.Systems.Players
             }
 
             Animator.Update(Player);
+
+
+            //attack handling 
+            if (InAttackMode)
+            {
+                Player.noItems = true;
+                Player.noBuilding = true;
+                Player.controlUseItem = false;
+                Player.releaseUseItem = true;
+                Player.controlUseTile = false;
+                Player.cursorItemIconEnabled = false;
+                Player.cursorItemIconID = 0;
+                Player.cursorItemIconText = null;
+            }
         }
 
         private void HandleBreathRegeneration()
@@ -417,7 +438,7 @@ namespace ATLAMod.Systems.Players
             Main.NewText($"[ATLA] Cast {move.Name}");
 
             return true;
-        }     
+        }        
 
         public override void ProcessTriggers(TriggersSet triggerSet)
         {
@@ -469,6 +490,23 @@ namespace ATLAMod.Systems.Players
                 if (PlayerInput.Triggers.JustPressed.Hotbar4) { SelectSlot(3); PlayerInput.Triggers.Current.Hotbar4 = false; }
                 if (PlayerInput.Triggers.JustPressed.Hotbar5) { SelectSlot(4); PlayerInput.Triggers.Current.Hotbar5 = false; }
                 if (PlayerInput.Triggers.JustPressed.Hotbar6) { SelectSlot(5); PlayerInput.Triggers.Current.Hotbar6 = false; }
+                if (PlayerInput.Triggers.JustPressed.Hotbar7) { SelectSlot(5); PlayerInput.Triggers.Current.Hotbar7 = false; }
+                if (PlayerInput.Triggers.JustPressed.Hotbar8) { SelectSlot(5); PlayerInput.Triggers.Current.Hotbar8 = false; }
+                if (PlayerInput.Triggers.JustPressed.Hotbar9) { SelectSlot(5); PlayerInput.Triggers.Current.Hotbar9 = false; }
+                if (PlayerInput.Triggers.JustPressed.Hotbar10) { SelectSlot(5); PlayerInput.Triggers.Current.Hotbar10 = false; }
+
+                Player.noItems = true;
+                Player.controlUseItem = false;
+                Player.releaseUseItem = true;
+                Player.itemAnimation = 0;
+                Player.itemTime = 0;
+
+                Player.controlUseTile = false;
+                Player.noBuilding = true;
+
+                Player.cursorItemIconEnabled = false;
+                Player.cursorItemIconID = 0;
+                Player.cursorItemIconText = null;
             }
 
             bool overUI = Main.LocalPlayer.mouseInterface;
@@ -478,11 +516,12 @@ namespace ATLAMod.Systems.Players
 
                 PlayerInput.Triggers.Current.MouseLeft = false;
                 Player.controlUseItem = false;
-                Player.releaseUseItem = true;
+                Player.releaseUseItem = false;
                 Player.itemAnimation = 0;
                 Player.itemTime = 0;
                 Player.controlUseTile = false;
                 Player.controlThrow = false;
+                Player.noItems = true;
             }
 
             if (!overUI && PlayerInput.Triggers.Current.MouseLeft)
@@ -491,6 +530,53 @@ namespace ATLAMod.Systems.Players
                 Player.controlUseItem = false;
                 Player.controlUseTile = false;
                 Player.controlThrow = false;
+                Player.noItems = true;                
+            }
+        }
+
+        public override bool PreItemCheck()
+        {            
+
+            if (Player.whoAmI == Main.myPlayer && InAttackMode)
+            {
+                if (!_heldSwappedThisTick)
+                {
+                    _heldIndex = Player.selectedItem;
+                    _heldStash = Player.inventory[Player.selectedItem].Clone();
+                    Player.inventory[Player.selectedItem].TurnToAir();
+                    _heldSwappedThisTick = true;
+                }
+
+                Player.noItems = true;
+                Player.noBuilding = true;
+                Player.controlUseItem = false;
+                Player.releaseUseItem = true;
+                Player.controlUseTile = false;
+                Player.itemAnimation = 0;
+                Player.itemTime = 0;
+                Player.cursorItemIconEnabled = false;
+                Player.cursorItemIconID = 0;
+                Player.cursorItemIconText = null;
+            }
+
+            return true;
+        }
+
+        public override void PostItemCheck()
+        {
+            if (_heldSwappedThisTick)
+            {
+                if (Player.inventory[Player.selectedItem].IsAir)
+                    Player.inventory[Player.selectedItem] = _heldStash;
+                else
+                {
+                    int idx = Array.FindIndex(Player.inventory, it => it.IsAir);
+                    if (idx >= 0) Player.inventory[idx] = _heldStash;
+                    else Player.QuickSpawnItem(Player.GetSource_Misc("BendingRestore"), _heldStash);
+                }
+
+                _heldStash = null;
+                _heldSwappedThisTick = false;
             }
         }
     }

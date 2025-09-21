@@ -56,8 +56,5 @@
 	</ItemGroup>
 
 	<!-- References -->
-	<ItemGroup>
-	  <Folder Include="Systems\DamageClass\" />
-	</ItemGroup>
 
 </Project>

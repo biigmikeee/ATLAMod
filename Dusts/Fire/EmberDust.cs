@@ -23,30 +23,37 @@ namespace ATLAMod.Dusts.Fire
         {
             public int FrameTimer;
             public int FrameIndex;
-            public int TicksPerFrame;
+            public bool Forward = true;
+            public int TicksPerFrame = 4;
             public int SpinDir;
+            public float SpinSpeed;
+            public float SizeJitter;
         }
 
         public override void OnSpawn(Dust dust)
         {
             dust.noGravity = true;
             dust.noLight = false;
-            dust.scale = Main.rand.NextFloat(0.95f, 1.35f);
+
+            var state = new DustState
+            {
+                FrameTimer = 0,
+                FrameIndex = 0,
+                TicksPerFrame = 4,
+                SpinDir = Main.rand.NextBool() ? 1 : -1,
+                SpinSpeed = Main.rand.NextFloat(0.10f, 0.22f),
+                SizeJitter = Main.rand.NextFloat(0.60f, 1f)
+            };
+            dust.customData = state;
+
+            if (dust.scale <= 0.5f) dust.scale = Main.rand.NextFloat(0.60f, 1f);
+            dust.scale *= state.SizeJitter;
             dust.rotation = Main.rand.NextFloat(-MathHelper.Pi, MathHelper.Pi);
 
             if (dust.velocity.LengthSquared() < 0.001f)
             {
                 dust.velocity = Main.rand.NextVector2Circular(1.2f, 1.2f);
-            }
-
-            var state = new DustState
-            {
-                FrameTimer = 0,
-                FrameIndex = Main.rand.NextBool() ? 0 : 1,
-                TicksPerFrame = 6,
-                SpinDir = Main.rand.NextBool() ? 1 : -1
-            };
-            dust.customData = state;
+            }           
 
             dust.frame = new Rectangle(0, 0, FrameW, FrameH);
         }
@@ -58,18 +65,23 @@ namespace ATLAMod.Dusts.Fire
                 if (state.FrameTimer >= state.TicksPerFrame)
                 {
                     state.FrameTimer = 0;
-                    state.FrameIndex++;
+                    int max = FrameCount - 1;
 
-                    if (state.FrameIndex >= FrameCount)
+                    if (state.Forward)
                     {
-                        dust.active = false;
-                        return false;
+                        if (state.FrameIndex < max) state.FrameIndex++;
+                        else state.Forward = false;
+                    }
+                    else
+                    {
+                        if (state.FrameIndex > 0) state.FrameIndex--;
+                        else { dust.active = false; return false; }
                     }
 
                     dust.frame.Y = state.FrameIndex * StrideY;
-                }
+                }                    
 
-                dust.rotation *= 0.04f * state.SpinDir;
+                dust.rotation += state.SpinSpeed * state.SpinDir;
             }
 
             dust.position += dust.velocity;
