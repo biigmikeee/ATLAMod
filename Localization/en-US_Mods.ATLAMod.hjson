@@ -47,3 +47,10 @@ Projectiles: {
 	FireFistProj.DisplayName: Fire Fist Proj
 	FireBurstProjEffect.DisplayName: Fire Burst Proj Effect
 }
+
+DamageClasses: {
+	AirDamageClass.DisplayName: Air Damage Class
+	EarthDamageClass.DisplayName: Earth Damage Class
+	FireDamageClass.DisplayName: Fire Damage Class
+	WaterDamageClass.DisplayName: Water Damage Class
+}

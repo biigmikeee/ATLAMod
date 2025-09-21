@@ -13,6 +13,7 @@ using Terraria.DataStructures;
 using ATLAMod.Dusts.Fire;
 using Terraria.DataStructures;
 using ATLAMod.Effects;
+using ATLAMod.Systems.Bending;
 
 namespace ATLAMod.Projectiles.Firebending
 {
@@ -39,12 +40,12 @@ namespace ATLAMod.Projectiles.Firebending
             Projectile.width = FrameWidth;
             Projectile.height = FrameHeight;
             Projectile.friendly = true;
-            Projectile.penetrate = 1;
-            Projectile.DamageType = DamageClass.Melee;
+            Projectile.penetrate = 1;            
             Projectile.timeLeft = 180;
             Projectile.ignoreWater = true;
             Projectile.tileCollide = true;
             Projectile.extraUpdates = 1;
+            Projectile.DamageType = ModContent.GetInstance<FireDamageClass>();
 
         }
 

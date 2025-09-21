@@ -65,6 +65,7 @@ namespace ATLAMod.Systems.Players
         public void RunAfter(int ticks, Action action) => _timers.Add((ticks, action));
         private readonly Dictionary<string, int> _moveCooldown = new();
 
+        //ATTACK STUFF
         public struct AttackUpgrades
         {
             public float MeleeDamageMult;
@@ -74,6 +75,27 @@ namespace ATLAMod.Systems.Players
             public float CooldownMult;
             public float CostMult;
         }
+
+        //DAMAGE CLASS STUFF
+        public StatModifier FireTotalDamage => Player.GetTotalDamage<FireDamageClass>();
+        public float FireTotalCrit => Player.GetTotalCritChance<FireDamageClass>();
+        public StatModifier FireTotalKnockback => Player.GetTotalKnockback<FireDamageClass>();
+
+
+        public StatModifier WaterTotalDamage => Player.GetTotalDamage<WaterDamageClass>();
+        public float WaterTotalCrit => Player.GetTotalCritChance<WaterDamageClass>();
+        public StatModifier WaterTotalKnockback => Player.GetTotalKnockback<WaterDamageClass>();
+
+        public StatModifier EarthTotalDamage => Player.GetTotalDamage<EarthDamageClass>();
+        public float EarthTotalCrit => Player.GetTotalCritChance<EarthDamageClass>();
+        public StatModifier EarthTotalKnockback => Player.GetTotalKnockback<EarthDamageClass>();
+
+
+        public StatModifier AirTotalDamage => Player.GetTotalDamage<AirDamageClass>();
+        public float AirTotalCrit => Player.GetTotalCritChance<AirDamageClass>();
+        public StatModifier AirTotalKnockback => Player.GetTotalKnockback<AirDamageClass>();
+
+
 
         public AttackUpgrades Up = new AttackUpgrades
         {

@@ -86,18 +86,34 @@ namespace ATLAMod.Systems.Bending.Moves.Fire
                             }
                             spawnCenter = (lo + hi) * 0.5f;
                         }
-                    }                    
+                    }
 
-                    int type = ModContent.ProjectileType<FireFistProj>();
-                    int dmg = 30; float kb = 3f;
+                    int baseDamage = 30;
+                    float baseKnockback = 3f;
                     Vector2 vel = along * 4f;
+                    
 
-                    Projectile.NewProjectile(
+                    var dmgClass = ModContent.GetInstance<FireDamageClass>();
+
+                    int styleDamage = (int)p.GetTotalDamage<FireDamageClass>().ApplyTo(baseDamage);
+                    int styleKB = (int)p.GetTotalKnockback<FireDamageClass>().ApplyTo(baseKnockback);
+                    int styleCrit = (int)p.GetTotalCritChance<FireDamageClass>();
+
+                    float tagMult = (bp != null ? bp.GetDamageMult(Tags) : 1f);
+                    int finalDamage = (int)MathF.Round(styleDamage * tagMult);
+
+                    int proj = Projectile.NewProjectile(
                         p.GetSource_FromThis(),
                         spawnCenter,
                         vel,
-                        type,
-                        dmg, kb, p.whoAmI);
+                        ModContent.ProjectileType<FireFistProj>(),
+                        finalDamage,
+                        styleKB,
+                        p.whoAmI
+                    );
+
+                    var pr = Main.projectile[proj];
+                    pr.DamageType = dmgClass;
                 });
             }));                    
         }

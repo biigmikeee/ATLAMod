@@ -300,7 +300,7 @@ namespace ATLAMod.UI.AttackHotbar
                         BendingPlayer.BendingStyle.Air => "chi",
                         _ => "Cost"
                     };
-                    Main.instance.MouseText($"{move.Name} - Uses {move.Cost} {resourceWord}");
+                    Main.instance.MouseText($"{move.Name} - Uses {move.Cost} {resourceWord} \n {move.BaseDamage} Firebending Damage");
                 }
                 break;
             }  

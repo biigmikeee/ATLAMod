@@ -43,7 +43,7 @@ namespace ATLAMod.Dusts.Fire
             {
                 FrameTimer = 0,
                 FrameIndex = Main.rand.NextBool() ? 0 : 1,
-                TicksPerFrame = 3,
+                TicksPerFrame = 6,
                 SpinDir = Main.rand.NextBool() ? 1 : -1
             };
             dust.customData = state;
@@ -69,7 +69,7 @@ namespace ATLAMod.Dusts.Fire
                     dust.frame.Y = state.FrameIndex * StrideY;
                 }
 
-                dust.rotation *= 0.12f * state.SpinDir;
+                dust.rotation *= 0.04f * state.SpinDir;
             }
 
             dust.position += dust.velocity;
