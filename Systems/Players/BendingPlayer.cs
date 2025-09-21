@@ -59,11 +59,6 @@ namespace ATLAMod.Systems.Players
         public int UnlockedSlots = 2;
         public int SelectedSlotIndex = 0;
         public bool HotbarExpanded = false;
-
-
-        private Item _heldStash;
-        private int _heldIndex = -1;
-        private bool _heldSwappedThisTick;
         private bool InAttackMode => HotbarExpanded || (Animator?.IsBusy ?? false);
 
         //PLAYER ANIMATION HANDLING
@@ -532,52 +527,6 @@ namespace ATLAMod.Systems.Players
                 Player.controlThrow = false;
                 Player.noItems = true;                
             }
-        }
-
-        public override bool PreItemCheck()
-        {            
-
-            if (Player.whoAmI == Main.myPlayer && InAttackMode)
-            {
-                if (!_heldSwappedThisTick)
-                {
-                    _heldIndex = Player.selectedItem;
-                    _heldStash = Player.inventory[Player.selectedItem].Clone();
-                    Player.inventory[Player.selectedItem].TurnToAir();
-                    _heldSwappedThisTick = true;
-                }
-
-                Player.noItems = true;
-                Player.noBuilding = true;
-                Player.controlUseItem = false;
-                Player.releaseUseItem = true;
-                Player.controlUseTile = false;
-                Player.itemAnimation = 0;
-                Player.itemTime = 0;
-                Player.cursorItemIconEnabled = false;
-                Player.cursorItemIconID = 0;
-                Player.cursorItemIconText = null;
-            }
-
-            return true;
-        }
-
-        public override void PostItemCheck()
-        {
-            if (_heldSwappedThisTick)
-            {
-                if (Player.inventory[Player.selectedItem].IsAir)
-                    Player.inventory[Player.selectedItem] = _heldStash;
-                else
-                {
-                    int idx = Array.FindIndex(Player.inventory, it => it.IsAir);
-                    if (idx >= 0) Player.inventory[idx] = _heldStash;
-                    else Player.QuickSpawnItem(Player.GetSource_Misc("BendingRestore"), _heldStash);
-                }
-
-                _heldStash = null;
-                _heldSwappedThisTick = false;
-            }
-        }
+        }        
     }
 }

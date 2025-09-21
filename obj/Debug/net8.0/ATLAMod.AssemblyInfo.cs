@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ATLAMod")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+50697ae14631cc57055a87afd6a8a6f8a9a1670b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
 [assembly: System.Reflection.AssemblyProductAttribute("ATLAMod")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ATLAMod")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
