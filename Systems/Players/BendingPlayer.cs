@@ -20,10 +20,11 @@ using Microsoft.Xna.Framework.Graphics;
 using Steamworks;
 using ATLAMod.Systems.Players.Animation;
 using Terraria.DataStructures;
+using System.Runtime.InteropServices;
 
 namespace ATLAMod.Systems.Players
 {
-    public class BendingPlayer : ModPlayer
+    public partial class BendingPlayer : ModPlayer
     {
         public enum BendingStyle { None, Fire, Water, Earth, Air }
 
@@ -58,7 +59,11 @@ namespace ATLAMod.Systems.Players
         public MoveSlot[] MoveSlots = new MoveSlot[6];
         public int UnlockedSlots = 2;
         public int SelectedSlotIndex = 0;
-        public bool HotbarExpanded = false;        
+        public bool HotbarExpanded = false;
+        private bool inAttackMode => HotbarExpanded;
+        private bool _wasInAttackMode = false;
+        private int? _savedSelectedIndex = null;
+        private Item _savedSelectedItem = null;
 
         //PLAYER ANIMATION HANDLING
         public BendingAnimator Animator = new BendingAnimator();
@@ -246,6 +251,12 @@ namespace ATLAMod.Systems.Players
                 if (t <= 0) { a?.Invoke(); _timers.RemoveAt(i); }
                 else _timers[i] = (t, a);
             }
+
+            if (inAttackMode && !_wasInAttackMode)
+                EnterAttackMode_SwapSelectedItem();
+            else if (!inAttackMode && _wasInAttackMode)
+                ExitAttackMode_RestoreSelectedItem();
+            _wasInAttackMode = inAttackMode;
 
             Animator.Update(Player);
         }
@@ -514,9 +525,8 @@ namespace ATLAMod.Systems.Players
             }
         }    
         
-/*        public override bool PreItemCheck()
-        {
-            bool inAttackMode = HotbarExpanded || (Animator?.IsBusy ?? false);
+        public override bool PreItemCheck()
+        {            
 
             if (inAttackMode)
             {
@@ -530,7 +540,7 @@ namespace ATLAMod.Systems.Players
 
                 Player.itemAnimation = 0;
                 Player.itemAnimationMax = 0;
-                Player.itemTime = 0;
+                Player.itemTime = 0;                
                 Player.cursorItemIconEnabled = false;
                 Player.cursorItemIconID = 0;
                 Player.cursorItemIconText = null;
@@ -539,6 +549,71 @@ namespace ATLAMod.Systems.Players
             }
 
             return true;
-        }*/
+        }
+
+        private void EnterAttackMode_SwapSelectedItem()
+        {
+            if (_savedSelectedIndex != null) return;
+
+            _savedSelectedIndex = Player.selectedItem;
+            _savedSelectedItem = Player.inventory[_savedSelectedIndex.Value].Clone();
+
+            int emptyHotbar = -1;
+            for (int i = 0; i < 10; i++)
+            {
+                if (Player.inventory[i].IsAir)
+                {
+                    emptyHotbar = 1;
+                    break;
+                }
+            }
+
+            if (emptyHotbar != -1)
+            {
+                Player.selectedItem = emptyHotbar;
+            }
+            else
+            {
+                Player.inventory[_savedSelectedIndex.Value].TurnToAir();
+            }
+
+            Player.cursorItemIconEnabled = false;
+        }
+
+        private void ExitAttackMode_RestoreSelectedItem()
+        {
+            if (_savedSelectedIndex == null || _savedSelectedItem == null) return;
+
+            int idx = _savedSelectedIndex.Value;
+
+            if (Player.inventory[idx].IsAir)
+            {
+                Player.inventory[idx] = _savedSelectedItem;
+                if (idx < 10) Player.selectedItem = idx;
+            }
+            else
+            {
+                int dest = -1;
+                for (int i = 0; i < 58; i++)
+                {
+                    if (Player.inventory[i].IsAir) { dest = 1; break; }
+                }
+
+                if (dest != -1)
+                {
+                    Player.inventory[dest] = _savedSelectedItem;
+                    if (dest < 10) Player.selectedItem = dest;
+                }
+                else
+                {
+                    Item.NewItem(Player.GetSource_Misc("ATLA_AttackHotbarRestore"), Player.Hitbox, _savedSelectedItem.type, _savedSelectedItem.stack, noBroadcast: false, prefixGiven: _savedSelectedItem.prefix);
+                }
+            }
+
+            _savedSelectedItem = null;
+            _savedSelectedIndex = null;
+        }
+
+
     }
 }
