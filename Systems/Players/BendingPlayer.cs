@@ -58,8 +58,7 @@ namespace ATLAMod.Systems.Players
         public MoveSlot[] MoveSlots = new MoveSlot[6];
         public int UnlockedSlots = 2;
         public int SelectedSlotIndex = 0;
-        public bool HotbarExpanded = false;
-        private bool InAttackMode => HotbarExpanded || (Animator?.IsBusy ?? false);
+        public bool HotbarExpanded = false;        
 
         //PLAYER ANIMATION HANDLING
         public BendingAnimator Animator = new BendingAnimator();
@@ -249,20 +248,6 @@ namespace ATLAMod.Systems.Players
             }
 
             Animator.Update(Player);
-
-
-            //attack handling 
-            if (InAttackMode)
-            {
-                Player.noItems = true;
-                Player.noBuilding = true;
-                Player.controlUseItem = false;
-                Player.releaseUseItem = true;
-                Player.controlUseTile = false;
-                Player.cursorItemIconEnabled = false;
-                Player.cursorItemIconID = 0;
-                Player.cursorItemIconText = null;
-            }
         }
 
         private void HandleBreathRegeneration()
@@ -527,6 +512,33 @@ namespace ATLAMod.Systems.Players
                 Player.controlThrow = false;
                 Player.noItems = true;                
             }
-        }        
+        }    
+        
+/*        public override bool PreItemCheck()
+        {
+            bool inAttackMode = HotbarExpanded || (Animator?.IsBusy ?? false);
+
+            if (inAttackMode)
+            {
+                Player.noItems = true;
+                Player.noBuilding = true;
+
+                Player.controlUseItem = false;
+                Player.releaseUseItem = true;
+                Player.controlUseTile = false;
+                Player.controlThrow = false;
+
+                Player.itemAnimation = 0;
+                Player.itemAnimationMax = 0;
+                Player.itemTime = 0;
+                Player.cursorItemIconEnabled = false;
+                Player.cursorItemIconID = 0;
+                Player.cursorItemIconText = null;
+
+                return false;
+            }
+
+            return true;
+        }*/
     }
 }
