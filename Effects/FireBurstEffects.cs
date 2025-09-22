@@ -66,6 +66,19 @@ namespace ATLAMod.Effects
                 Main.dust[d].fadeIn = Main.rand.NextFloat(0.3f, 0.6f);
             }
 
+            for (int i = 0; i < dustCount; i++)
+            {
+                Vector2 dir = (normal.RotatedByRandom(MathHelper.ToRadians(85))) * Main.rand.NextFloat(0.6f, 1.0f);
+                Vector2 v = dir.SafeNormalize(Vector2.UnitX) * Main.rand.NextFloat(0.8f, emberSpeed) * scale;
+
+                int typeDust = DustID.SolarFlare;
+                int d = Dust.NewDust(pos - new Vector2(8), 16, 16, typeDust, v.X, v.Y, 0, default, Main.rand.NextFloat(1.0f, 1.4f) * scale);
+
+                Main.dust[d].noGravity = true;
+                Main.dust[d].alpha = Main.rand.Next(0, 50);
+                Main.dust[d].fadeIn = Main.rand.NextFloat(0.2f, 0.45f);
+            }
+
             // A few heavier, short-lived smoke wisps (optional)
             for (int i = 0; i < dustCount / 4; i++)
             {

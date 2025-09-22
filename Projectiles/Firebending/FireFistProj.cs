@@ -60,7 +60,7 @@ namespace ATLAMod.Projectiles.Firebending
             if (Projectile.velocity.LengthSquared() > 0.001f)
                 Projectile.rotation = Projectile.velocity.ToRotation();
 
-            Lighting.AddLight(Projectile.Center, 0.85f, 0.65f, 0.15f);
+            Lighting.AddLight(Projectile.Center, 0.95f, 0.72f, 0.18f);
 
             Projectile.frameCounter++;
             if(Projectile.frameCounter >= TicksPerFrame)
@@ -82,6 +82,20 @@ namespace ATLAMod.Projectiles.Firebending
                 float speed = Main.rand.NextFloat(0.3f, 0.6f);
                 d.velocity = tangent * (Main.rand.NextBool() ? -speed : speed) + Main.rand.NextVector2Circular(0.2f, 0.2f);
                 d.alpha = 0;
+
+                if (Main.rand.NextBool(2))
+                {
+                    int emberType = DustID.SolarFlare;
+                    Vector2 basePos = Projectile.Center - Projectile.velocity.SafeNormalize(Vector2.UnitX) * 6f;
+                    int d1 = Dust.NewDust(basePos - new Vector2(4, 4), 8, 8, emberType, 0f, 0f, 0, default, Main.rand.NextFloat(1f, 2f));
+                    Dust dd = Main.dust[d1];
+                    dd.noGravity = true;
+
+                    dd.velocity = Projectile.velocity * Main.rand.NextFloat(0.05f, 0.12f) + Main.rand.NextVector2Circular(0.6f, 0.6f);
+
+                    dd.alpha = Main.rand.Next(0, 40);
+                    dd.fadeIn = Main.rand.NextFloat(0.15f, 0.35f);
+                }
             }
         }
 

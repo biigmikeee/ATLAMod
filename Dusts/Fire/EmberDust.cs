@@ -41,7 +41,7 @@ namespace ATLAMod.Dusts.Fire
                 FrameIndex = 0,
                 TicksPerFrame = 4,
                 SpinDir = Main.rand.NextBool() ? 1 : -1,
-                SpinSpeed = Main.rand.NextFloat(0.10f, 0.22f),
+                SpinSpeed = Main.rand.NextFloat(0.05f, 0.08f),
                 SizeJitter = Main.rand.NextFloat(0.60f, 1f)
             };
             dust.customData = state;
@@ -85,14 +85,14 @@ namespace ATLAMod.Dusts.Fire
             }
 
             dust.position += dust.velocity;
-            dust.velocity *= 0.965f;
+            dust.velocity *= 0.967f;
             dust.velocity.Y -= 0.02f;
 
             Lighting.AddLight(dust.position, 0.9f * dust.scale, 0.5f * dust.scale, 0.08f * dust.scale);
-            dust.scale *= 0.985f;
-            dust.alpha = (int)MathHelper.Clamp(255f * (1.25f - dust.scale), 0f, 160f);
+            dust.scale *= 0.990f;
+            dust.alpha = (int)MathHelper.Clamp(255f * (1.08f - dust.scale), 0f, 110f);
 
-            if (dust.scale < 0.45f)
+            if (dust.scale < 0.3f)
                 dust.active = false;
 
             return false;

@@ -21,6 +21,7 @@ using Steamworks;
 using ATLAMod.Systems.Players.Animation;
 using Terraria.DataStructures;
 using System.Runtime.InteropServices;
+using System.Configuration;
 
 namespace ATLAMod.Systems.Players
 {
@@ -64,6 +65,7 @@ namespace ATLAMod.Systems.Players
         private bool _wasInAttackMode = false;
         private int? _savedSelectedIndex = null;
         private Item _savedSelectedItem = null;
+        private bool _clearedSelectedSlot = false;
 
         //PLAYER ANIMATION HANDLING
         public BendingAnimator Animator = new BendingAnimator();
@@ -259,7 +261,7 @@ namespace ATLAMod.Systems.Players
             _wasInAttackMode = inAttackMode;
 
             Animator.Update(Player);
-        }
+        }        
 
         private void HandleBreathRegeneration()
         {
@@ -485,19 +487,6 @@ namespace ATLAMod.Systems.Players
                 if (PlayerInput.Triggers.JustPressed.Hotbar8) { SelectSlot(5); PlayerInput.Triggers.Current.Hotbar8 = false; }
                 if (PlayerInput.Triggers.JustPressed.Hotbar9) { SelectSlot(5); PlayerInput.Triggers.Current.Hotbar9 = false; }
                 if (PlayerInput.Triggers.JustPressed.Hotbar10) { SelectSlot(5); PlayerInput.Triggers.Current.Hotbar10 = false; }
-
-                Player.noItems = true;
-                Player.controlUseItem = false;
-                Player.releaseUseItem = true;
-                Player.itemAnimation = 0;
-                Player.itemTime = 0;
-
-                Player.controlUseTile = false;
-                Player.noBuilding = true;
-
-                Player.cursorItemIconEnabled = false;
-                Player.cursorItemIconID = 0;
-                Player.cursorItemIconText = null;
             }
 
             bool overUI = Main.LocalPlayer.mouseInterface;
@@ -525,7 +514,7 @@ namespace ATLAMod.Systems.Players
             }
         }    
         
-        public override bool PreItemCheck()
+/*        public override bool PreItemCheck()
         {            
 
             if (inAttackMode)
@@ -549,21 +538,22 @@ namespace ATLAMod.Systems.Players
             }
 
             return true;
-        }
+        }*/
 
         private void EnterAttackMode_SwapSelectedItem()
         {
             if (_savedSelectedIndex != null) return;
 
             _savedSelectedIndex = Player.selectedItem;
-            _savedSelectedItem = Player.inventory[_savedSelectedIndex.Value].Clone();
+            _savedSelectedItem = null;
+            _clearedSelectedSlot = false;
 
             int emptyHotbar = -1;
             for (int i = 0; i < 10; i++)
             {
                 if (Player.inventory[i].IsAir)
                 {
-                    emptyHotbar = 1;
+                    emptyHotbar = i;
                     break;
                 }
             }
@@ -574,6 +564,8 @@ namespace ATLAMod.Systems.Players
             }
             else
             {
+                _clearedSelectedSlot = true;
+                _savedSelectedItem = Player.inventory[_savedSelectedIndex.Value].Clone();
                 Player.inventory[_savedSelectedIndex.Value].TurnToAir();
             }
 
@@ -582,34 +574,45 @@ namespace ATLAMod.Systems.Players
 
         private void ExitAttackMode_RestoreSelectedItem()
         {
-            if (_savedSelectedIndex == null || _savedSelectedItem == null) return;
+            if (_savedSelectedIndex == null) return;
 
             int idx = _savedSelectedIndex.Value;
 
-            if (Player.inventory[idx].IsAir)
+            if (_clearedSelectedSlot)
             {
-                Player.inventory[idx] = _savedSelectedItem;
-                if (idx < 10) Player.selectedItem = idx;
+                if (_savedSelectedItem != null)
+                {
+                    if (Player.inventory[idx].IsAir)
+                    {
+                        Player.inventory[idx] = _savedSelectedItem;
+                        if (idx < 10) Player.selectedItem = idx;
+                    }
+                    else
+                    {
+                        int dest = -1;
+                        for (int i = 0; i < 58; i++)
+                        {
+                            if (Player.inventory[i].IsAir) { dest = i; break; }
+                        }
+
+                        if (dest != -1)
+                        {
+                            Player.inventory[dest] = _savedSelectedItem;
+                            if (dest < 10) Player.selectedItem = dest;
+                        }
+                        else
+                        {
+                            Item.NewItem(Player.GetSource_Misc("ATLA_AttackHotbarRestore"), Player.Hitbox, _savedSelectedItem.type, _savedSelectedItem.stack, noBroadcast: false, prefixGiven: _savedSelectedItem.prefix);
+                        }
+                    }
+                }
             }
             else
             {
-                int dest = -1;
-                for (int i = 0; i < 58; i++)
-                {
-                    if (Player.inventory[i].IsAir) { dest = 1; break; }
-                }
-
-                if (dest != -1)
-                {
-                    Player.inventory[dest] = _savedSelectedItem;
-                    if (dest < 10) Player.selectedItem = dest;
-                }
-                else
-                {
-                    Item.NewItem(Player.GetSource_Misc("ATLA_AttackHotbarRestore"), Player.Hitbox, _savedSelectedItem.type, _savedSelectedItem.stack, noBroadcast: false, prefixGiven: _savedSelectedItem.prefix);
-                }
+                if (idx < 10) Player.selectedItem = idx;
             }
 
+            _clearedSelectedSlot = false;
             _savedSelectedItem = null;
             _savedSelectedIndex = null;
         }
