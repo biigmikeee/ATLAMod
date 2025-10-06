@@ -35,6 +35,11 @@ Items: {
 		DisplayName: Bending Scroll
 		Tooltip: ""
 	}
+
+	BendingToggled: {
+		DisplayName: Bending Toggled
+		Tooltip: ""
+	}
 }
 
 Keybinds: {

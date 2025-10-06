@@ -49,7 +49,7 @@
 	  <None Remove="Buffs\BendingStyles\waterbenderBuff.png" />
 	  <None Remove="Buffs\FireBendingBuffs\BreathExhaustion.png" />
 	  <None Remove="Dusts\Fire\EmberDust.png" />
-	  <None Remove="Effects\fireBurstEffect.png" />						  	  <None Remove="Items\BendingScroll.png" />						  	  <None Remove="Projectiles\Firebending\fireFistProj.png" />						  	  <None Remove="Projectiles\fireFistProjTest.png" />
+	  <None Remove="Effects\fireBurstEffect.png" />						  	  <None Remove="Items\BendingScroll.png" />						  	  <None Remove="Projectiles\Firebending\fireFistProj.png" />						  	  <None Remove="Projectiles\fireFistProjTest.png" />						  	  <None Remove="Systems\Bending\BendingToggle\BendingToggled.png" />
 	  <None Remove="UI\BreathMeter\BreathFillGlowTEST.png" />
 	  <None Remove="UI\BreathMeter\BreathMeterBack.png" />
 	  <None Remove="UI\BreathMeter\PassiveGlowNEW.png" />
