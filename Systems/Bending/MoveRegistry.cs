@@ -19,6 +19,7 @@ namespace ATLAMod.Systems.Bending
         public static void Bootstrap()
         {
             Register(new Moves.Fire.FireFist());
+            Register(new Moves.Fire.FireYoyo());
         }
     }
 }
