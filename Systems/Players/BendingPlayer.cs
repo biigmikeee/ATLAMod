@@ -144,7 +144,11 @@ namespace ATLAMod.Systems.Players
             // adding fireFist(testMove) to test with hotbar
             if (MoveRegistry.Get("fire_fist") != null)
             {
-                MoveSlots[0].MoveId = "fire_fist";
+                MoveSlots[0].MoveId = "fire_fist";                
+            }            
+            if (MoveRegistry.Get("fire_yoyo") != null)
+            {
+                MoveSlots[1].MoveId = "fire_yoyo";
             }
         }
 
@@ -660,7 +664,21 @@ namespace ATLAMod.Systems.Players
             placeholderIndex = -1;
         }
 
-        public override void OnEnterWorld() => ExitAttackMode_RestoreSelectedItem();
+        public override void OnEnterWorld()
+        {
+            ExitAttackMode_RestoreSelectedItem();
+
+
+            // adding fireFist(testMove) to test with hotbar
+            if (MoveRegistry.Get("fire_fist") != null)
+            {
+                MoveSlots[0].MoveId = "fire_fist";
+            }
+            if (MoveRegistry.Get("fire_yoyo") != null)
+            {
+                MoveSlots[1].MoveId = "fire_yoyo";
+            }
+        }
         public override void OnRespawn() => ExitAttackMode_RestoreSelectedItem();
     }
 }

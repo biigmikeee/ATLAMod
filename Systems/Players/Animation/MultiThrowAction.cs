@@ -78,7 +78,7 @@ namespace ATLAMod.Systems.Players.Animation
                 float u = EaseOutCubic((t - windup) / (float)Math.Max(1, strike));
                 p.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, MathHelper.Lerp(back, forward, u));
             }
-            else (t <= windup + strike)
+            else
             {
                 float u = EaseOutCubic((t - (windup + strike)) / (float)Math.Max(1, recover));
                 p.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, MathHelper.Lerp(back, forward, u));

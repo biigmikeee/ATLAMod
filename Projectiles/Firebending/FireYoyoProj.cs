@@ -15,7 +15,7 @@ namespace ATLAMod.Projectiles.Firebending
 {
     public class FireYoyoProj : ModProjectile
     {
-        public override string Texture => "ATLAMod/Projectiles/Firebending/fireYoyoProj";
+        public override string Texture => "ATLAMod/Projectiles/Firebending/fireYoyoProjTEST";
 
         public override void SetDefaults()
         {
@@ -31,7 +31,7 @@ namespace ATLAMod.Projectiles.Firebending
 
         private bool returning;
         private const float Speed = 14f;
-        private const float ReturnAccel = 0.55f;
+        private const float ReturnAccel = 1.5f;
 
         public override void AI()
         {
@@ -48,10 +48,10 @@ namespace ATLAMod.Projectiles.Firebending
 
             if (!returning)
             {
-                if (Projectile.ai[0]++ > 20f || distance > 400f)
+                if (Projectile.ai[0]++ > 20f || distance > 150f)
                 {
                     returning = true;
-                    Projectile.tileCollide = false;
+                    Projectile.tileCollide = true;
                 }
             }
             else
@@ -66,7 +66,7 @@ namespace ATLAMod.Projectiles.Firebending
                 Projectile.velocity = (Projectile.velocity * 20f + toPlayer * ReturnAccel * Speed) / 21f;
             }
 
-            Projectile.rotation += 0.45f * Math.Sign(Projectile.velocity.X);
+            Projectile.rotation += 0.25f * Math.Sign(Projectile.velocity.X);
         }
         
         //NEED IMPACT HANDLING

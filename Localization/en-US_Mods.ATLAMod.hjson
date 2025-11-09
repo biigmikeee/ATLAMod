@@ -51,6 +51,7 @@ Keybinds: {
 Projectiles: {
 	FireFistProj.DisplayName: Fire Fist Proj
 	FireBurstProjEffect.DisplayName: Fire Burst Proj Effect
+	FireYoyoProj.DisplayName: Fire Yoyo Proj
 }
 
 DamageClasses: {
